@@ -1,0 +1,22 @@
+{
+  "name": "cse6242_datavisualanalytic_project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yishangru/CSE6242_DataAnalyticsInfoVis_Project.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yishangru/CSE6242_DataAnalyticsInfoVis_Project/issues"
+  },
+  "homepage": "https://github.com/yishangru/CSE6242_DataAnalyticsInfoVis_Project#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}

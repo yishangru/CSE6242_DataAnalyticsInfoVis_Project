@@ -1,0 +1,66 @@
+@font-face {
+  font-family: 'mapFont';
+  src: url('./MapFont.ttf') format('truetype'); /* Chrome 4+, Firefox 3.5, Opera 10+, Safari 3¡ª5 */
+}
+
+@font-face {
+  font-family: 'pirates';
+  src: url('./PiratesWriters.ttf') format('truetype'); /* Chrome 4+, Firefox 3.5, Opera 10+, Safari 3¡ª5 */
+}
+
+
+#map1 svg #map1mapTitle {
+	font-family: mapFont;
+	font-weight: 20px;
+	font-style: oblique;
+	font-size: 130px;
+	text-anchor: middle;
+}
+
+#map2 svg #map2mapTitle {
+  font-family: mapFont;
+  font-weight: 20px;
+  font-style: oblique;
+  font-size: 130px;
+  text-anchor: middle;
+}
+
+.countryNameLabel {
+	background: rgba(255, 255, 255, 0.8);
+  	padding: 0px 5px;
+  	border:0;
+  	border-radius:15px;
+  	box-shadow: 1 0px 0px;
+  	text-anchor: start;
+  	font-weight: 200;
+  	font-family: pirates;
+  	font-size: 15px;
+}
+
+.countryInfoTooltip {
+    background: rgba(127,201,127, 0.8);
+    padding: 0px 10px 0px 10px;
+    border:3;
+    border-color: rgb(179,205,227);
+    border-radius:10px;
+    box-shadow: 1 0px 0px;
+    text-anchor: start;
+    font-weight: 200;
+    min-width: 135px;
+    font-family: pirates;
+    font-size: 15px;
+}
+
+.countryCompareInfo {
+  padding: 0px 10px;
+  font-family: pirates;
+  font-size: 22px;
+  background: rgba(128,177,211,0.8);
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  border-radius: 5px;
+}
+
+.countryCompareInfo h3 {
+  margin: 0 0 5px;
+  color: rgb(217,95,2);
+}
