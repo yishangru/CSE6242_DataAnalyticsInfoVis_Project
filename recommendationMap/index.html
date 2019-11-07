@@ -3,18 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Recommendation Map</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js" integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og==" crossorigin=""></script>
     <link rel="stylesheet" href="/recommendationMap/recommendationMap.css">
 </head>
 <body>
-    <div id="main">
-        <div id="map1" style="height: 520px; width: 1000px; border: 1px solid #777;"></div>
-        <br>
-        <div id="map2" style="height: 520px; width: 1000px; border: 1px solid #777;"></div>
-    </div>
+    <div id="recommendationMap" style="border: 2px solid #777;margin:0;padding:0;"></div>
 </body>
 <script src="http://d3js.org/d3.v5.min.js"></script>
-<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
 <script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
 <script src="/recommendationMap/recommendationMap.js"></script>
 <script src="/recommendationMap/index.js"></script>

@@ -8,21 +8,17 @@
   src: url('./PiratesWriters.ttf') format('truetype'); /* Chrome 4+, Firefox 3.5, Opera 10+, Safari 3¡ª5 */
 }
 
-
-#map1 svg #map1mapTitle {
-	font-family: mapFont;
-	font-weight: 20px;
-	font-style: oblique;
-	font-size: 130px;
-	text-anchor: middle;
+html, body {
+  margin: 0;
+  padding: 0;
 }
 
-#map2 svg #map2mapTitle {
-  font-family: mapFont;
-  font-weight: 20px;
-  font-style: oblique;
-  font-size: 130px;
-  text-anchor: middle;
+#recommendationMap svg #recommendationMapmapTitleText {
+	font-family: mapFont;
+	font-weight: 100px;
+	font-style: oblique;
+	font-size: 200px;
+	text-anchor: middle;
 }
 
 .countryNameLabel {
@@ -51,16 +47,101 @@
     font-size: 15px;
 }
 
-.countryCompareInfo {
+.localPointInfo {
+  display: inline;
   padding: 0px 10px;
   font-family: pirates;
-  font-size: 22px;
-  background: rgba(128,177,211,0.8);
+  background: rgba(27,158,119,0.8);
   box-shadow: 0 0 15px rgba(0,0,0,0.2);
   border-radius: 5px;
 }
 
-.countryCompareInfo h3 {
-  margin: 0 0 5px;
+.localPointInfo .exploreTitle {
+  margin: 10px 0px 2px 0px;
+  color: rgb(0,255,127);
+  display: inline;
+  font-size: 25px;
+}
+
+.localPointInfo button {
+  font-size: 20px;
+  font-weight: bold;
+  display: inline;
+  margin:10;
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  padding: 0;
+  padding-left: 2px;
+  padding-right: 2px;
+  border: 1px solid black;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  border-radius: 5px;
+  background: rgb(0,255,127);
+}
+
+.yelpCompareInfo {
+  display: inline;
+  padding: 0px 10px;
+  font-family: pirates;
+  background: rgba(252,141,98,0.8);
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  border-radius: 5px;
+}
+
+.yelpCompareInfo .exploreTitle {
+  margin: 10px 0px 2px 0px;
   color: rgb(217,95,2);
+  display: inline;
+  font-size: 25px;
+}
+
+.yelpCompareInfo button {
+  font-size: 20px;
+  font-weight: bold;
+  display: inline;
+  margin:10;
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  padding: 0;
+  padding-left: 2px;
+  padding-right: 2px;
+  border: 1px solid black;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  border-radius: 5px;
+  background: rgb(217,95,2);
+}
+
+.airbnbCompareInfo {
+  display: inline;
+  padding: 0px 10px;
+  font-family: pirates;
+  background: rgba(141,160,203,0.8);
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  border-radius: 5px;
+}
+
+.airbnbCompareInfo .exploreTitle {
+  margin: 10px 0px 2px 0px;
+  color: rgb(55,126,184);
+  display: inline;
+  font-size: 25px;
+}
+
+.airbnbCompareInfo button {
+  font-size: 20px;
+  font-weight: bold;
+  display: inline;
+  margin:10;
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  padding: 0;
+  padding-left: 2px;
+  padding-right: 2px;
+  border: 1px solid black;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  border-radius: 5px;
+  background: rgb(55,126,184);
 }
