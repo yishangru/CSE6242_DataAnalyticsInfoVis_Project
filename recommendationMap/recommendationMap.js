@@ -50,17 +50,51 @@ function worldMap(divId, maxZoom) {
 		pane: 'svgLayer'
 	});
 
+	/* --------------user preference list & preference search ------------------ */
+		this.preferencedivPosition = L.point(-10, 10);
+		this.preferenceInfo = L.control({position: 'bottomleft'});
+		this.preferenceInfo.associatedMap = this;
+		this.preferenceInfo.onAdd = function(map) {
+			this._div = L.DomUtil.create('div', 'preferenceInfo');
+			return this._div;
+		}
+		this.preferenceInfo.addTo(this.map);
+		let preferencediv = d3.select("#" + this.divId).select(".preferenceInfo")
+			.style("width", "335px")
+			.style("height", "42px");
+
+		let preferenceForm = preferencediv.append("div")
+			.attr("class", "btn-group btn-group-sm")
+			.attr("data-toggle", "buttons");
+		preferenceForm.append("label")
+			.attr("class", "btn btn-secondary active")
+			.attr("data-type", "Preference Search")
+			.text("Preference Search")
+			.append("input")
+			.attr("type", "checkbox")
+			.attr("name", "options")
+			.attr("autocomplete", "off")
+			.property("checked", true);
+		preferenceForm.append("label")
+			.attr("class", "btn btn-secondary")
+			.attr("data-type", "Preference List")
+			.text("Preference List")
+			.append("input")
+			.attr("type", "checkbox")
+			.attr("name", "options")
+			.attr("autocomplete", "off");
+		preferencediv.append("button")
+			.attr("type", "button")
+			.attr("class", "preferenceButton")
+			.text("▲")
+			.on("click", expandInfoSection);
+		L.DomUtil.setPosition(this.preferenceInfo._div, this.preferencedivPosition);
+	/* ------------------------------------------ */
+
 	/* --------------info dash board (right)------------------ */
 		this.localPointdivPosition = L.point(0, 0);
 		this.yelpdivPosition = L.point(0, 0);
 		this.airbnbdivPosition = L.point(0, 0);
-
-		this.countryClickedMap = d3.map()
-		this.countryInfoColorMap = ["#1b9e77", "#d95f02", "#7570b3", "#e7298a"];
-		this.climateXscale = d3.scaleBand()
-			.domain(["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"])
-			.range([20, 175])
-			.padding(0.02);
 
 		this.localPointInfo = L.control();
 		this.localPointInfo.associatedMap = this;
@@ -79,7 +113,7 @@ function worldMap(divId, maxZoom) {
 		localPointdiv.append("button")
 			.attr("type", "button")
 			.attr("class", "localPointButton")
-			.text("▾")
+			.text("▼")
 			.on("click", expandInfoSection);
 		L.DomUtil.setPosition(this.localPointInfo._div, this.localPointdivPosition);
 		
@@ -99,7 +133,7 @@ function worldMap(divId, maxZoom) {
 		yelpdiv.append("button")
 			.attr("type", "button")
 			.attr("class", "yelpButton")
-			.text("▾")
+			.text("▼")
 			.on("click", expandInfoSection);
 		L.DomUtil.setPosition(this.yelpCompareInfo._div, this.yelpdivPosition);
 
@@ -119,7 +153,7 @@ function worldMap(divId, maxZoom) {
 		airbnbdiv.append("button")
 			.attr("type", "button")
 			.attr("class", "airbnbButton")
-			.text("▾")
+			.text("▼")
 			.on("click", expandInfoSection);
 		L.DomUtil.setPosition(this.airbnbCompareInfo._div, this.airbnbdivPosition);
 	/* ------------------------------------------ */
@@ -224,24 +258,28 @@ function updateMapTitle(e) {
 function expandInfoSection(e){
 	let buttonClass = d3.select(this).attr("class").toString();
 
+	if (d3.select(this.parentNode).style("height") !== "42px") {
+		d3.select(this.parentNode).style("height", "42px");
+		if (buttonClass === "preferenceButton") {
+			d3.select(this).text("▲");
+		} else {
+			d3.select(this).text("▼");
+		}
+		return;
+	}
+
 	if (buttonClass === "yelpButton") {
-		if (d3.select(this.parentNode).style("height") !== "42px"){
-			d3.select(this.parentNode).style("height", "42px");
-		} else {
-			d3.select(this.parentNode).style("height", "350px");
-		}
+		d3.select(this.parentNode).style("height", "350px");
+		d3.select(this).text("▲");
 	} else if (buttonClass === "airbnbButton") {
-		if (d3.select(this.parentNode).style("height") !== "42px"){
-			d3.select(this.parentNode).style("height", "42px");
-		} else {
-			d3.select(this.parentNode).style("height", "350px");
-		}
+		d3.select(this.parentNode).style("height", "350px");
+		d3.select(this).text("▲");
 	} else if (buttonClass === "localPointButton") {
-		if (d3.select(this.parentNode).style("height") !== "42px"){
-			d3.select(this.parentNode).style("height", "42px");
-		} else {
-			d3.select(this.parentNode).style("height", "350px");
-		}
+		d3.select(this.parentNode).style("height", "350px");
+		d3.select(this).text("▲");
+	} else if (buttonClass === "preferenceButton") {
+		d3.select(this.parentNode).style("height", "400px");
+		d3.select(this).text("▼");
 	}
 }
 

@@ -13,6 +13,21 @@ html, body {
   padding: 0;
 }
 
+label.btn.btn-secondary,
+label.btn.btn-secondary:focus,
+label.btn.btn-secondary:active,
+label.btn.btn-secondary.active,
+label.btn.btn-secondary.active:focus,
+label.btn.btn-secondary.active:active {
+    color: rgb(251,128,114);
+    border-radius: 10px;
+    font-size: 19px;
+    padding: 0px 10px 0px 10px;
+    margin: 5px 5px 2px 5px;
+    border-color: rgb(251,128,114);
+    box-shadow: none !important;
+}
+
 #recommendationMap svg #recommendationMapmapTitleText {
 	font-family: mapFont;
 	font-weight: 100px;
@@ -45,6 +60,39 @@ html, body {
     min-width: 135px;
     font-family: pirates;
     font-size: 15px;
+}
+
+.preferenceInfo {
+  display: inline;
+  padding: 0px 2px;
+  font-family: pirates;
+  background: rgba(255,217,47,0.8);
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  border-radius: 5px;
+}
+
+.preferenceInfo div label {
+  width: 145px;
+  margin: 2px;
+  border-radius: 10px;
+  background: rgba(0,0,0,0);
+}
+
+.preferenceInfo button {
+  font-size: 20px;
+  font-weight: bold;
+  display: inline;
+  margin:10;
+  position: absolute;
+  top: 6px;
+  right: 5px;
+  padding: 0;
+  padding-left: 2px;
+  padding-right: 2px;
+  border: 1px solid black;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  border-radius: 5px;
+  background: rgb(152,78,163);
 }
 
 .localPointInfo {
