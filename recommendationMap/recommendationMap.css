@@ -22,9 +22,10 @@ label.btn.btn-secondary.active:active {
     color: rgb(251,128,114);
     border-radius: 10px;
     font-size: 19px;
+    font-weight: bold;
     padding: 0px 10px 0px 10px;
     margin: 5px 5px 2px 5px;
-    border-color: rgb(251,128,114);
+    border-color: rgb(251,128,114) !important;
     box-shadow: none !important;
 }
 
@@ -72,10 +73,19 @@ label.btn.btn-secondary.active:active {
 }
 
 .preferenceInfo div label {
-  width: 145px;
   margin: 2px;
   border-radius: 10px;
   background: rgba(0,0,0,0);
+}
+
+.preferenceInfo div label:hover{
+  background: rgba(127,201,127,0.8);
+}
+
+.preferenceInfo div label:active,
+.preferenceInfo div label:focus,
+.preferenceInfo div .active {
+  background: rgba(251,180,174,0.8) !important;
 }
 
 .preferenceInfo button {

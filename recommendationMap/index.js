@@ -6,7 +6,7 @@ dataPath = {
 	countryPrPath: "./data/country/precipitation-2020_2039.csv"
 }
 
-recommendationMap = new worldMap("recommendationMap", 10);
+recommendationMap = new recommendationMap("recommendationMap", 10);
 
 Promise.all([
 	d3.csv(dataPath.countryInfoPath, function(d) {

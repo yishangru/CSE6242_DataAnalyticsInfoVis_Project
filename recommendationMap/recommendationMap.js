@@ -1,4 +1,4 @@
-function worldMap(divId, maxZoom) {
+function recommendationMap(divId, maxZoom) {
 	/* add divId of world map */
 	this.divId = divId;
 	/* add set to record which country to show */
@@ -60,7 +60,7 @@ function worldMap(divId, maxZoom) {
 		}
 		this.preferenceInfo.addTo(this.map);
 		let preferencediv = d3.select("#" + this.divId).select(".preferenceInfo")
-			.style("width", "335px")
+			.style("width", "360px")
 			.style("height", "42px");
 
 		let preferenceForm = preferencediv.append("div")
@@ -69,16 +69,17 @@ function worldMap(divId, maxZoom) {
 		preferenceForm.append("label")
 			.attr("class", "btn btn-secondary active")
 			.attr("data-type", "Preference Search")
-			.text("Preference Search")
+			.text("Preference Search \u2713")
+			.style("width", "165px")
 			.append("input")
 			.attr("type", "checkbox")
 			.attr("name", "options")
-			.attr("autocomplete", "off")
-			.property("checked", true);
+			.attr("autocomplete", "off");
 		preferenceForm.append("label")
 			.attr("class", "btn btn-secondary")
 			.attr("data-type", "Preference List")
 			.text("Preference List")
+			.style("width", "150px")
 			.append("input")
 			.attr("type", "checkbox")
 			.attr("name", "options")
@@ -175,7 +176,7 @@ function worldMap(divId, maxZoom) {
 /* end map style */
 
 /* for map function */
-worldMap.prototype.showSelectionArround = function() {
+recommendationMap.prototype.showSelectionArround = function() {
 	/* with selection, showing the item around it */
 	if (this.currentSelection) {
 
