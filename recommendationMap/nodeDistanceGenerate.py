@@ -7,7 +7,7 @@ import pandas as pd
 
 # create a mongo client
 connectDBclient = pymongo.MongoClient("mongodb://cse6252-2019fall:243c4BFs7HJREOpni4cnCHfcv2JWFJJ2MEjBlZN7dyUwrjrCedIAID61IaZ4RPxi5zmAMZwxhqvQlxMfRuO0NA==@cse6252-2019fall.documents.azure.com:10255/?ssl=true")
-print(connectDBclient.list_database_names())
+#print(connectDBclient.list_database_names())
 
 dblist = connectDBclient.list_database_names()
 
@@ -18,8 +18,8 @@ projectdb = connectDBclient["cse6242"]
 # print(projectdb.command('listCollections'))
 
 # print collection statistics
-print(projectdb.command('collstats', 'business'))
-print(projectdb.command('collstats', 'review'))
+#print(projectdb.command('collstats', 'business'))
+#print(projectdb.command('collstats', 'review'))
 
 
 """
@@ -63,11 +63,35 @@ limit query result:
 
 
 # two collections in database: review and business
-businessTable = projectdb["business"]
-x = businessTable.find_one()
-print(x)
 
+"""
+# write the business as csv
+businessTable = projectdb["business"]
+# test query to get key
+csvWriteDict = dict()
+headerRow = dict(businessTable.find_one())
+for key in headerRow.keys():
+	csvWriteDict[key] = list()
+
+documents = businessTable.find({"is_open": 1})
+for document in documents:
+	for key in headerRow.keys():
+		csvWriteDict[key].append(document[key])
+pd.DataFrame(data=csvWriteDict).to_csv("../data/business.csv", index=False)
+"""
+
+# this is \t \n in text, print with repr: print(repr(text))
+openBusiness = list(set(business["business_id"] for business in projectdb["business"].find({"is_open": 1}, {"business_id": 1})))
 reviewTable = projectdb["review"]
-x = reviewTable.find_one()
-print(x)
-#pd.DataFrame(data=x).to_csv("sampleReviewRow.csv", index=False)
+# test query to get key
+csvWriteDict = dict()
+headerRow = dict(reviewTable.find_one({"business_id": {"$in": openBusiness}}))
+for key in headerRow.keys():
+	csvWriteDict[key] = list()
+
+documents = reviewTable.find({"business_id": {"$in": openBusiness}})
+for i, document in enumerate(documents):
+	print(i)
+	for key in headerRow.keys():
+		csvWriteDict[key].append(document[key])
+pd.DataFrame(data=csvWriteDict).to_csv("../data/review.csv", index=False)

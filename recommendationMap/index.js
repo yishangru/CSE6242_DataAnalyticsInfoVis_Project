@@ -1,9 +1,7 @@
 dataPath = {
-	coffeePath: "./data/coffee/Coffee-clean.csv",
-	countryInfoPath: "./data/country/CoffeeCountryInfo.csv",
-	countryGeoPath: "./recommendationMap/countries.geojson",
-	countryTempPath: "./data/country/temperature-2020_2039.csv",
-	countryPrPath: "./data/country/precipitation-2020_2039.csv"
+	hosts: "./data/hosts.csv",
+	restaurants: "./data/business.csv",
+	attractions: "./data/attractions.csv"
 }
 
 recommendationMap = new recommendationMap("recommendationMap", 10);
