@@ -1,0 +1,33 @@
+id,type,name,latitude,longitude,rating,introduction,website
+1,casino,Caesars Palace,36.1166277,-115.1767568,4.6,Best casino for sports betting,https://en.wikipedia.org/wiki/Caesars_Palace
+2,casino,Aria Resort & Casino,36.1070349,-115.1779758,4.6,Best casino for slots,https://en.wikipedia.org/wiki/Aria_Resort_and_Casino
+3,casino,Bellagio,36.11311495,-115.1770065,4.7,Best casino for poker,https://en.wikipedia.org/wiki/Bellagio_(resort)
+4,casino,MGM Grand,36.1027149,-115.1726404,4,Best casino for non-gamblers,https://en.wikipedia.org/wiki/MGM_Grand_Las_Vegas
+5,casino,Golden Nugget Las Vegas,36.1697918,-115.1457855,4.3,Best casino for diversity of table games,https://en.wikipedia.org/wiki/Golden_Nugget_Las_Vegas
+6,casino,Red Rock Casino Resort & Spa,36.1568415,-115.3335588,4.5,Best off-Strip casino,"https://en.wikipedia.org/wiki/Red_Rock_Casino,_Resort_%26_Spa"
+7,casino,The Cosmopolitan of Las Vegas,36.11015665,-115.1740915,4.6,Best casino for foodies,https://en.wikipedia.org/wiki/Cosmopolitan_of_Las_Vegas
+8,casino,"Stratosphere Casino, Hotel & Tower",36.1473566,-115.1554747,4.1,est casino for views,https://en.wikipedia.org/wiki/Stratosphere_Las_Vegas
+9,casino,Circus Circus Las Vegas,36.13771985,-115.1658458,3.8,Best casino for families,https://en.wikipedia.org/wiki/Circus_Circus_Las_Vegas
+10,casino,Mandalay Bay,36.0924965,-115.1758522,4.5,Best casino pool,https://en.wikipedia.org/wiki/Mandalay_Bay
+11,casino,The Venetian Las Vegas,36.12172095,-115.1693347,4.7,Best casino spa,https://en.wikipedia.org/wiki/The_Venetian_Las_Vegas
+12,casino,Planet Hollywood Resort and Casino,36.1100625,-115.1715131,4.4,Best casino for entertainment,https://en.wikipedia.org/wiki/Planet_Hollywood_Las_Vegas
+1,park,Sunset Park,36.065649,-115.111595,4.6,,http://www.clarkcountynv.gov/parks/Pages/sunset-park-clark-county-nv.aspx
+2,park,Clark County Wetlands Park,36.1011282,-115.0230789,4.6,,http://www.clarkcountynv.gov/parks/pages/cc-wetlands-park-homepage.aspx
+3,park,South Tower Park,36.1621606,-115.3447965,4.7,,https://summerlink.com/parks
+4,park,Mesa Park,36.0898885,-115.327354,4.7,,https://summerlink.com/parks
+5,park,Floyd Lamb Park,36.322824,-115.267957,4.6,,https://www.lasvegasnevada.gov/Residents/Parks-Facilities/Floyd-Lamb-Park
+6,park,Exploration Peak Park,36.0149289,-115.260483,4.8,,http://www.clarkcountynv.gov/parks/Pages/default.aspx
+7,park,Lone Mountain Park,36.2416315,-115.3101825,4.7,,http://www.clarkcountynv.gov/parks/Pages/parkslocator.aspx
+8,park,North Tower Park,36.1776679,-115.346293,4.7,,https://summerlink.com/parks
+9,park,Centennial Hills Park,36.2888821,-115.261766,4.6,,https://recreation.lasvegasnevada.gov/wbwsc/webtrac.wsc/wbsplash.html?wbp=1
+10,park,Summerlin Centre Community Park,36.1514459,-115.3228885,4.5,,https://summerlink.com/parks
+11,park,Craig Ranch Regional Park,36.2434428,-115.1500008,4.6,,http://www.cityofnorthlasvegas.com/departments/nls_(parks_and_rec)/craig_ranch_regional_park.php
+12,park,BARKIN BASIN PARK,36.2314224,-115.2527135,4.6,,https://www.lasvegasnevada.gov/
+13,park,Cornerstone Park,36.03547,-115.0554934,4.6,,http://parks.nv.gov/parks/spring-mountain-ranch
+14,park,Paseo Verde Park,36.021913,-115.0652543,4.6,,https://www.cityofhenderson.com/henderson-happenings/parks-and-trails/locations-and-features/paseo-verde-park
+15,park,Paseo Vista Park,36.0188199,-115.0978969,4.6,,https://www.cityofhenderson.com/henderson-happenings/parks-and-trails/locations-and-features/paseo-vista-park
+16,park,Heritage Park,36.0308682,-114.9546302,4.5,,https://www.cityofhenderson.com/parks-and-recreation
+17,park,Spring Mountain Ranch State Park,36.0699092,-115.4533769,4.6,,http://parks.nv.gov/parks/spring-mountain-ranch
+18,park,Majestic Park,36.2311479,-115.3130793,4.5,,https://www.lasvegasnevada.gov/Residents/Parks-Facilities/Majestic-Park
+19,park,Bark Park,36.0346953,-114.9542019,4.6,,https://www.cityofhenderson.com/henderson-happenings/parks-and-trails/locations-and-features/bark-park-at-heritage-park
+20,park,White School Park,36.081809,-115.061419,4.7,,https://www.cityofhenderson.com/henderson-happenings/parks-and-trails/locations-and-features/white-school-park
