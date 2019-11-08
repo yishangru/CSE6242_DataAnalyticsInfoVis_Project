@@ -159,6 +159,9 @@ function recommendationMap(divId, maxZoom) {
 		L.DomUtil.setPosition(this.airbnbCompareInfo._div, this.airbnbdivPosition);
 	/* ------------------------------------------ */
 
+	// add set for showing marker
+	this.attractionShowSet = d3.set();
+
 	// default layer order: tile, GeoJSON, Marker shadows, Marker icons, Popups
 	this.tileLayer.addTo(this.map);
 	this.tileLayer.associatedMap = this;
@@ -176,6 +179,22 @@ function recommendationMap(divId, maxZoom) {
 /* end map style */
 
 /* for map function */
+
+/* there are two set
+recommendationMap.prototype.showAttractionMarker = function() {
+
+}
+
+recommendationMap.prototype.showRestaurantMarker = function() {
+
+}
+
+recommendationMap.prototype.showHostMarker = function() {
+
+}
+
+
+/* change following to interaction */
 recommendationMap.prototype.showSelectionArround = function() {
 	/* with selection, showing the item around it */
 	if (this.currentSelection) {
@@ -283,5 +302,10 @@ function expandInfoSection(e){
 		d3.select(this).text("▼");
 	}
 }
-
 /* end map interaction */
+
+
+
+/* wait to add */
+/*
+1. use turf.buffer to get a shape cover the area within specific distance from center point / circle

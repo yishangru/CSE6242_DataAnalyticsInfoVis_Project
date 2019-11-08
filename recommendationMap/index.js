@@ -10,6 +10,13 @@ var attractionInfoMap = d3.map();
 var hostInfoMap = d3.map();
 var restaurantMap = d3.map();
 
+/*
+structure as {
+	attractions: {0-1: array, 1-2: array, 2-3: array, 3-4: array, 4-5: array, 5-6: array},
+	restaurants: {0-1: array, 1-2: array, 2-3: array, 3-4: array, 4-5: array, 5-6: array},
+	hosts: {0-1: array, 1-2: array, 2-3: array, 3-4: array, 4-5: array, 5-6: array}
+}
+*/
 var attractionAroudMap = d3.map();
 var restaurantAroundMap = d3.map();
 var hostAroundMap = d3.map();
