@@ -9,16 +9,16 @@ function recommendationMap(divId, maxZoom) {
 	/* declare meta map attribute */
 	var minZoom = 10;
 	this.mapInitialCenter = new L.LatLng(36.16991, -115.139832);
-	var maxBounds = L.latLngBounds(L.latLng(36, -115.15), L.latLng(36.34, -115.13));
+	this.mapMaxBounds = L.latLngBounds(L.latLng(28.16991, -118.139832), L.latLng(44.16991, -112.139832));
+	//this.mapMaxBounds = L.latLngBounds(L.latLng(36, -115.15), L.latLng(36.34, -115.13));
 
 
 	d3.select("#" + this.divId).style("width", (window.screen.availWidth - 4) + "px").style("height", (window.screen.availHeight - 75) + "px");
 	this.map = L.map(divId, {
-		maxBounds: maxBounds,
+		maxBounds: this.mapMaxBounds,
 		minZoom: minZoom
 	}).setView(this.mapInitialCenter, minZoom);
 	this.map.associatedMap = this;
-	this.mapInitialCenterPoint = this.map.latLngToLayerPoint(this.mapInitialCenter);
 
 	// add pane to map for svg
 	this.map.createPane('svgLayer');
@@ -27,17 +27,15 @@ function recommendationMap(divId, maxZoom) {
 	// make the mouse event go through the event and reach below
 	this.map.getPane('svgLayer').style.pointerEvents = 'none';
 
-	// add pane to map for country name tooltip
-	this.map.createPane('nameTooltipLayer');
-	// set the stack position of added pane layer
-	this.map.getPane('nameTooltipLayer').style.zIndex = 575;
-	// make the mouse event go through the event and reach below
-	this.map.getPane('nameTooltipLayer').style.pointerEvents = 'none';
-
 	// add pane to map for country layer
-	this.map.createPane('countryLayer');
+	this.map.createPane('markerLayer');
 	// set the stack position of added pane layer
-	this.map.getPane('countryLayer').style.zIndex = 200;
+	this.map.getPane('markerLayer').style.zIndex = 500;
+
+	// add pane to map for country name tooltip
+	this.map.createPane('TooltipLayer');
+	// set the stack position of added pane layer
+	this.map.getPane('TooltipLayer').style.zIndex = 575;
 
 	// add tile layer for map
 	this.tileLayer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -160,7 +158,17 @@ function recommendationMap(divId, maxZoom) {
 	/* ------------------------------------------ */
 
 	// add set for showing marker
+	this.attractionMarkerMap = d3.map();
 	this.attractionShowSet = d3.set();
+	this.attractionAddedSet = d3.set();
+
+	this.restaurantMarkerMap = d3.map();
+	this.restaurantShowSet = d3.set();
+	this.restaurantAddedSet = d3.set();
+
+	this.hostMarkerMap = d3.map();
+	this.hostShowSet = d3.set();
+	this.hostAddedSet = d3.set();
 
 	// default layer order: tile, GeoJSON, Marker shadows, Marker icons, Popups
 	this.tileLayer.addTo(this.map);
@@ -168,9 +176,6 @@ function recommendationMap(divId, maxZoom) {
 	this.svgLayer.addTo(this.map);
 	this.svgLayer.associatedMap = this;
 	d3.select("#" + this.divId).select("svg").attr("id", this.divId + "geoSvg");
-
-	// add listener for zoom end and move end
-	this.map.on('zoomend', updateMapTitle);
 }
 
 /* for map style */
@@ -179,10 +184,45 @@ function recommendationMap(divId, maxZoom) {
 /* end map style */
 
 /* for map function */
+recommendationMap.prototype.initialMap = function() {
+	this.map.on('zoomend', updateZoomDemo);
+	updateZoomDemo.call(this.map);
+}
 
-/* there are two set
-recommendationMap.prototype.showAttractionMarker = function() {
+recommendationMap.prototype.showAttractionMarker = function(whetherInitial) {
+	let associatedMap = this;
+	if (whetherInitial) {
+		attractionInfoMap.keys().forEach(function(d) {
+			associatedMap.attractionShowSet.add(d);
+		})
+	}
 
+	this.attractionAddedSet.values().forEach(function(d){
+		if (!associatedMap.attractionShowSet.has(d)) {
+			associatedMap.map.removeLayer(associatedMap.attractionMarkerMap.get(d));
+			associatedMap.attractionAddedSet.remove(d);
+		}
+	});
+
+	this.attractionShowSet.each(function(d){
+		let attractionInfo = attractionInfoMap.get(d);
+		if(!associatedMap.attractionAddedSet.has(d)){
+			if(!associatedMap.attractionMarkerMap.has(d))
+				associatedMap.attractionMarkerMap.set(d, L.marker([attractionInfo.latitude, attractionInfo.longtitude]))
+			associatedMap.attractionAddedSet.add(d);
+		} else {
+			associatedMap.map.removeLayer(associatedMap.attractionMarkerMap.get(d));
+		}
+		let attractionMarker = associatedMap.attractionMarkerMap.get(d);
+		let scaleFactor = 1 + 5 * (associatedMap.map.getZoom()/(associatedMap.map.getMinZoom() + 2) - 1);
+		attractionMarker.setIcon( L.icon({
+				iconUrl: "./data/" + attractionInfo["type"] + "s_pictures/resize/" + attractionInfo["id"] + ".jpg",
+				iconSize: [Math.round(60 * scaleFactor), Math.round(45 * scaleFactor)],
+				iconAnchor: [0, 0],
+				popupAnchor: [-3, 76]
+		}))
+		associatedMap.attractionMarkerMap.get(d).addTo(associatedMap.map);
+	});
 }
 
 recommendationMap.prototype.showRestaurantMarker = function() {
@@ -239,13 +279,15 @@ function zoomToFeature(e) {
 	this.associatedMap.map.fitBounds(e.target.getBounds());
 }
 
-function updateMapTitle(e) {
+function updateZoomDemo(e) {
 	let associatedMap = this.associatedMap;
 	let geoSvg = d3.select("#" + associatedMap.divId).select("#" + associatedMap.divId + "geoSvg");
 
 	let mapTitleGroup = geoSvg.select("#" + associatedMap.divId + "mapTitleGroup");
+
 	if (this.getZoom()  <= this.getMinZoom() + 1){
 		/* display welcome text */
+		associatedMap.map.setView(associatedMap.mapInitialCenter);
 		if (mapTitleGroup.empty()){
 			mapTitleGroup = geoSvg.append("g").attr("id", associatedMap.divId + "mapTitleGroup");
 			mapTitleGroup.append("image").attr("id", associatedMap.divId + "mapTitleImage")
@@ -253,25 +295,33 @@ function updateMapTitle(e) {
 			mapTitleGroup.append("text").attr("id", associatedMap.divId + "mapTitleText")
 				.text("Explore Local Greatness");
 		};
-		let mapCenter = associatedMap.map.latLngToLayerPoint(associatedMap.map.getCenter());
+		let mapCenter = associatedMap.map.latLngToLayerPoint(associatedMap.mapInitialCenter);;
 		let mapTitleText = mapTitleGroup.select("#" + associatedMap.divId + "mapTitleText");
 		let mapTitleImage = mapTitleGroup.select("#" + associatedMap.divId + "mapTitleImage");
 
 		if (this.getZoom() == this.getMinZoom()) {
-			mapTitleImage.style("width", "400px").style("height", "400px")
-				.attr("transform", "rotate(-8,100,100)translate(" + (mapCenter.x - 450) + "," + (mapCenter.y - 250) + ")");
-			mapTitleText.attr("transform", "translate(" + (mapCenter.x - 50) + "," + (mapCenter.y + 300) + ")");
+			mapTitleImage.style("width", "460px").style("height", "430px")
+				.attr("transform", "rotate(-8,100,100)translate(" + (mapCenter.x - 450) + "," + (mapCenter.y - 300) + ")");
+			mapTitleText.attr("transform", "translate(" + (mapCenter.x - 50) + "," + (mapCenter.y + 300) + ")").style("font-size", "220px");
 		} else if (this.getZoom() == this.getMinZoom() + 1) {
-			mapTitleImage.style("width", "460px").style("height", "460px")
-				.attr("transform", "rotate(-8,100,100)translate(" + (mapCenter.x - 600) + "," + (mapCenter.y - 380) + ")");
-			mapTitleText.attr("transform", "translate(" + (mapCenter.x - 50) + "," + (mapCenter.y + 280) + ")");
+			mapTitleImage.style("width", "460px").style("height", "440px")
+				.attr("transform", "rotate(-8,100,100)translate(" + (mapCenter.x - 600) + "," + (mapCenter.y - 350) + ")");
+			mapTitleText.attr("transform", "translate(" + (mapCenter.x - 50) + "," + (mapCenter.y + 280) + ")").style("font-size", "200px");
 		}
-
+		associatedMap.attractionShowSet.clear();
+		associatedMap.restaurantShowSet.clear();
+		associatedMap.hostShowSet.clear();
+		associatedMap.showAttractionMarker(false);
+		associatedMap.showRestaurantMarker(false);
+		associatedMap.showHostMarker(false);
 	} else {
 		/* remove welcome text */
 		if (!mapTitleGroup.empty()) {
 			mapTitleGroup.remove();
 		}
+		associatedMap.showAttractionMarker(this.getZoom() <= this.getMinZoom() + 2? true : false);
+		associatedMap.showRestaurantMarker(this.getZoom() <= this.getMinZoom() + 2? true : false);
+		associatedMap.showHostMarker(this.getZoom() <= this.getMinZoom() + 2? true : false);
 	}
 }
 
@@ -306,6 +356,6 @@ function expandInfoSection(e){
 
 
 
-/* wait to add */
-/*
+/* wait to add
 1. use turf.buffer to get a shape cover the area within specific distance from center point / circle
+*/

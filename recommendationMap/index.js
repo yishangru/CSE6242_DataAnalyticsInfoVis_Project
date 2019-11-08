@@ -21,7 +21,6 @@ var attractionAroudMap = d3.map();
 var restaurantAroundMap = d3.map();
 var hostAroundMap = d3.map();
 
-
 Promise.all([
 		d3.csv(dataPath.attractions, attractionProcess),
 	]).then(function(data) {
@@ -31,17 +30,14 @@ Promise.all([
 		data[0].forEach(function(d) {
 			attractionInfoMap.set(d.attraction_id, attractionInfoData[d.attraction_id][0])
 		})
-		initialMap(recommendationMap);
+		recommendationMap.initialMap();
 });
-
-function initialMap(MapToInitialization) {
-	MapToInitialization.showSelectionArround();
-}
 
 function attractionProcess(d) {
 	return {
-		attraction_id: d.id + d.type,
-		attraction_type: d.type,
+		attraction_id: d.id + "_" + d.type,
+		id: d.id,
+		type: d.type,
 		latitude: +d.latitude,
 		longtitude: +d.longtitude,
 		rating: +d.rating,
