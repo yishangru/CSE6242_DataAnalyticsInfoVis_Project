@@ -64,7 +64,6 @@ limit query result:
 
 # two collections in database: review and business
 
-"""
 # write the business as csv
 businessTable = projectdb["business"]
 # test query to get key
@@ -77,8 +76,7 @@ documents = businessTable.find({"is_open": 1})
 for document in documents:
 	for key in headerRow.keys():
 		csvWriteDict[key].append(document[key])
-pd.DataFrame(data=csvWriteDict).to_csv("../data/business.csv", index=False)
-"""
+pd.DataFrame(data=csvWriteDict).to_csv("business.csv", index=False)
 
 # this is \t \n in text, print with repr: print(repr(text))
 openBusiness = list(set(business["business_id"] for business in projectdb["business"].find({"is_open": 1}, {"business_id": 1})))
@@ -94,4 +92,4 @@ for i, document in enumerate(documents):
 	print(i)
 	for key in headerRow.keys():
 		csvWriteDict[key].append(document[key])
-pd.DataFrame(data=csvWriteDict).to_csv("../data/review.csv", index=False)
+pd.DataFrame(data=csvWriteDict).to_csv("review.csv", index=False)
