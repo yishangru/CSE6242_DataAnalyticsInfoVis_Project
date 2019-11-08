@@ -6,17 +6,7 @@ dataPath = {
 
 recommendationMap = new recommendationMap("recommendationMap", 10);
 
-Promise.all([
-	d3.csv(dataPath.countryInfoPath, function(d) {
-		return {
-			Country: d.Country,
-			ISO3: d.ISO3,
-			ISO2: d.ISO2.toLowerCase(),
-			lat: +d.lat,
-			lng: +d.lng
-		}
-	}),
-]).then(function(data) {
+Promise.all([]).then(function(data) {
 	initialMap(recommendationMap);
 });
 

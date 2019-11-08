@@ -1,4 +1,4 @@
-# Coffee World Map
+# Las Vegas Recommendation Map
 
 ## To-do list
 - Add coffee bean effect before map coloring
@@ -7,7 +7,5 @@
 ---------------------------------------------------------
 - Initial
 ![Program Screenshot](./screenshot1.PNG?raw=true)
-- At first glance
+- Zoom in
 ![Program Screenshot](./screenshot2.PNG?raw=true)
-- After zoom in
-![Program Screenshot](./screenshot3.PNG?raw=true)
