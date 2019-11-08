@@ -4,18 +4,49 @@ dataPath = {
 	attractions: "./data/attractions.csv"
 }
 
-recommendationMap = new recommendationMap("recommendationMap", 10);
+var recommendationMap = new recommendationMap("recommendationMap", 10);
 
-Promise.all([]).then(function(data) {
-	initialMap(recommendationMap);
+var attractionInfoMap = d3.map();
+var hostInfoMap = d3.map();
+var restaurantMap = d3.map();
+
+var attractionAroudMap = d3.map();
+var restaurantAroundMap = d3.map();
+var hostAroundMap = d3.map();
+
+
+Promise.all([
+		d3.csv(dataPath.attractions, attractionProcess),
+	]).then(function(data) {
+		let attractionInfoData = d3.nest()
+			.key(d=>d.attraction_id)
+			.object(data[0]);
+		data[0].forEach(function(d) {
+			attractionInfoMap.set(d.attraction_id, attractionInfoData[d.attraction_id][0])
+		})
+		initialMap(recommendationMap);
 });
 
 function initialMap(MapToInitialization) {
-	/* initial map:
-		1. For coffee compare map, just add all country to its set;
-		2. For user preference map, take a country selection set and 
-		also a map for coffee for each country in country selection, 
-		using ISO3 code as key, a array of coffee as value
-	*/	
 	MapToInitialization.showSelectionArround();
+}
+
+function attractionProcess(d) {
+	return {
+		attraction_id: d.id + d.type,
+		attraction_type: d.type,
+		latitude: +d.latitude,
+		longtitude: +d.longtitude,
+		rating: +d.rating,
+		introduction: d.introduction,
+		website: d.website
+	}
+}
+
+function restaurantProcess(d) {
+
+}
+
+function hostProcess(d) {
+
 }
