@@ -376,8 +376,16 @@ recommendationMap.prototype.showRestaurantMarker = function(whetherUpdate) {
 	}
 }
 
-recommendationMap.prototype.showHostMarker = function() {
-
+recommendationMap.prototype.showHostMarker = function(whetherUpdate) {
+	/* 
+	When new attraction is selected, read selection;
+	For all attraction selection, update them
+	*/
+	if (whetherUpdate) {
+		
+	} else {
+		/* just dealing with zoom */
+	}
 }
 
 
@@ -397,35 +405,6 @@ recommendationMap.prototype.showSelectionArround = function() {
 /* end map function */
 
 /* for map interaction */
-function highlightFeature(e) {
-	let layer = e.target;
-
-	if (layer.selected)
-		return;
-
-	layer.setStyle({
-		weight: 5,
-		color: '#fb8072',
-		dashArray: '',
-		fillOpacity: 0.7
-	});
-
-	if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-		layer.bringToFront();
-	}
-}
-
-function resetHighlight(e) {
-	if (this.selected)
-		return;
-
-	this.associatedMap.countryLayer.resetStyle(e.target);
-}
-
-function zoomToFeature(e) {
-	this.associatedMap.map.fitBounds(e.target.getBounds());
-}
-
 function updateZoomDemo(e) {
 	let associatedMap = this.associatedMap;
 	let geoSvg = d3.select("#" + associatedMap.divId).select("#" + associatedMap.divId + "geoSvg");
@@ -490,6 +469,7 @@ function expandInfoSection(e){
 	let buttonClass = d3.select(this).attr("class").toString();
 
 	if (d3.select(this.parentNode).style("height") !== "42px") {
+		d3.select(this.parentNode).select("div").remove();
 		d3.select(this.parentNode).style("height", "42px");
 		if (buttonClass === "preferenceButton") {
 			d3.select(this).text("▲");
@@ -502,15 +482,23 @@ function expandInfoSection(e){
 	if (buttonClass === "yelpButton") {
 		d3.select(this.parentNode).style("height", "350px");
 		d3.select(this).text("▲");
+		let appenddiv = d3.select(this.parentNode).append("div");
+		appenddiv.html("<p>test test test <br/> test test test</p>");
 	} else if (buttonClass === "airbnbButton") {
 		d3.select(this.parentNode).style("height", "350px");
 		d3.select(this).text("▲");
+		let appenddiv = d3.select(this.parentNode).append("div");
+		appenddiv.html("<p>test test test <br/> test test test</p>");
 	} else if (buttonClass === "localPointButton") {
 		d3.select(this.parentNode).style("height", "350px");
 		d3.select(this).text("▲");
+		let appenddiv = d3.select(this.parentNode).append("div");
+		appenddiv.html("<p>test test test <br/> test test test</p>");
 	} else if (buttonClass === "preferenceButton") {
 		d3.select(this.parentNode).style("height", "400px");
 		d3.select(this).text("▼");
+		let appenddiv = d3.select(this.parentNode).append("div");
+		appenddiv.html("<p>This is for preference search<br/>Not Implement Yet</p>");
 	}
 }
 /* end map interaction */

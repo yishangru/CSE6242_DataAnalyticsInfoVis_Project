@@ -87,7 +87,7 @@ label.btn.btn-secondary.active:active {
   background: rgba(251,180,174,0.8) !important;
 }
 
-.preferenceInfo button {
+.preferenceInfo .preferenceButton {
   font-size: 20px;
   font-weight: bold;
   display: inline;
@@ -120,7 +120,11 @@ label.btn.btn-secondary.active:active {
   font-size: 25px;
 }
 
-.localPointInfo button {
+.localPointInfo p {
+  font-size: 16px;
+}
+
+.localPointInfo .localPointButton {
   font-size: 20px;
   font-weight: bold;
   display: inline;
@@ -153,7 +157,11 @@ label.btn.btn-secondary.active:active {
   font-size: 25px;
 }
 
-.yelpCompareInfo button {
+.yelpCompareInfo p {
+  font-size: 16px;
+}
+
+.yelpCompareInfo .yelpButton {
   font-size: 20px;
   font-weight: bold;
   display: inline;
@@ -186,7 +194,11 @@ label.btn.btn-secondary.active:active {
   font-size: 25px;
 }
 
-.airbnbCompareInfo button {
+.airbnbCompareInfo p {
+  font-size: 16px;
+}
+
+.airbnbCompareInfo .airbnbButton {
   font-size: 20px;
   font-weight: bold;
   display: inline;
