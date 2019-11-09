@@ -11,9 +11,12 @@ function recommendationMap(divId, maxZoom) {
 	
 	/* add present selection for local info demo */
 	this.currentSelection = null;
-	/* radius for show range */
-	this.showRadius = 5;
 	
+	/* radius for show range */
+	this.attractionRadius = 5;
+	this.restaurantRadius = 3;
+	this.hostRadius = 3;
+
 	/* declare meta map attribute */
 	var minZoom = 10;
 	this.mapInitialCenter = new L.LatLng(36.16991, -115.139832);
@@ -183,7 +186,7 @@ function recommendationMap(divId, maxZoom) {
 }
 
 /* for map style */
-recommendationMap.prototype.rangeStyle = function(f) {
+recommendationMap.prototype.AttractionRangeStyle = function(f) {
     return {
         weight: 4,
         opacity: 0.7,
@@ -191,6 +194,28 @@ recommendationMap.prototype.rangeStyle = function(f) {
         dashArray: '2',
         fillOpacity: 0.6,
         fillColor: '#8dd3c7'
+    }
+}
+
+recommendationMap.prototype.HostRangeStyle = function(f) {
+    return {
+        weight: 4,
+        opacity: 0.7,
+        color: '#e78ac3',
+        dashArray: '2',
+        fillOpacity: 0.6,
+        fillColor: '#8da0cb'
+    }
+}
+
+recommendationMap.prototype.RestaurantRangeStyle = function(f) {
+    return {
+        weight: 4,
+        opacity: 0.7,
+        color: '#7570b3',
+        dashArray: '2',
+        fillOpacity: 0.6,
+        fillColor: '#fbb4ae'
     }
 }
 
@@ -335,8 +360,8 @@ recommendationMap.prototype.updateAttractionMarkerShow = function(attractionId) 
 recommendationMap.prototype.showSelectedAttractionRange = function() {
 	let associatedMap = this;
 	/* 	this.attractionSelectedSet changed, use 5km for testing */
-	if(this.selectionRangeLayer != undefined) {
-		this.map.removeLayer(this.selectionRangeLayer);
+	if(this.AttractionSelectionRangeLayer != undefined) {
+		this.map.removeLayer(this.AttractionSelectionRangeLayer);
 	}
 
 	/* change to take input later */
@@ -346,21 +371,19 @@ recommendationMap.prototype.showSelectedAttractionRange = function() {
 		this.attractionSelectedSet.each(function(d) {
 			let attractionInfoData = attractionInfoMap.get(d);
 			let center = [attractionInfoData["longitude"], attractionInfoData["latitude"]];
-			featureCollection.push(turf.circle(center, associatedMap.showRadius, options));
+			featureCollection.push(turf.circle(center, associatedMap.attractionRadius, options));
 		})
 		let unionFeature = featureCollection[0];
-		if (featureCollection.length > 1) {
-			for (var i = 0; i < featureCollection.length - 1; i++) {
-				unionFeature = turf.union(unionFeature, featureCollection[i+1]);
-			}
+		for (var i = 0; i < featureCollection.length - 1; i++) {
+			unionFeature = turf.union(unionFeature, featureCollection[i+1]);
 		}
 
 		/* show on map */
-		this.selectionRangeLayer = L.geoJSON([unionFeature], {
-			style: this.rangeStyle,
+		this.AttractionSelectionRangeLayer  = L.geoJSON([unionFeature], {
+			style: this.AttractionRangeStyle,
 			pane: "geoLayer"
 		})
-		this.selectionRangeLayer.addTo(this.map);
+		this.AttractionSelectionRangeLayer.addTo(this.map);
 	}
 }
 
@@ -377,6 +400,42 @@ recommendationMap.prototype.updateRestaurantMarker = function(whetherUpdate) {
 	}
 }
 
+recommendationMap.prototype.updateRestaurantMarkerShow = function(restaurantId) {
+
+}
+
+/* show geo range for selected attraction */
+recommendationMap.prototype.showSelectedRestaurantRange = function() {
+	let associatedMap = this;
+	/* 	this.attractionSelectedSet changed, use 5km for testing */
+	if(this.RestaurantSelectionRangeLayer != undefined) {
+		this.map.removeLayer(this.RestaurantSelectionRangeLayer);
+	}
+
+	/* change to take input later */
+	if (this.restaurantSelectedSet.size() >= 1){
+		let featureCollection = [];
+		let options = {steps: 12, units: 'kilometers'};
+		this.restaurantSelectedSet.each(function(d) {
+			let restaurantInfoData = restaurantInfoMap.get(d);
+			let center = [restaurantInfoData["longitude"], restaurantInfoData["latitude"]];
+			featureCollection.push(turf.circle(center, associatedMap.restaurantRadius, options));
+		})
+		let unionFeature = featureCollection[0];
+		for (var i = 0; i < featureCollection.length - 1; i++) {
+			unionFeature = turf.union(unionFeature, featureCollection[i+1]);
+		}
+
+		/* show on map */
+		this.RestaurantSelectionRangeLayer  = L.geoJSON([unionFeature], {
+			style: this.RestaurantRangeStyle,
+			pane: "geoLayer"
+		})
+		this.RestaurantSelectionRangeLayer.addTo(this.map);
+	}
+}
+
+
 recommendationMap.prototype.updateHostMarker = function(whetherUpdate) {
 	/* 
 	When new attraction is selected, read selection;
@@ -389,6 +448,39 @@ recommendationMap.prototype.updateHostMarker = function(whetherUpdate) {
 	}
 }
 
+recommendationMap.prototype.updateHostMarkerShow = function(hostId) {
+	
+}
+
+recommendationMap.prototype.showSelectedHostsRange = function() {
+	let associatedMap = this;
+	/* 	this.attractionSelectedSet changed, use 5km for testing */
+	if(this.HostSelectionRangeLayer != undefined) {
+		this.map.removeLayer(this.HostSelectionRangeLayer);
+	}
+
+	/* change to take input later */
+	if (this.hostSelectedSet.size() >= 1){
+		let featureCollection = [];
+		let options = {steps: 12, units: 'kilometers'};
+		this.restaurantSelectedSet.each(function(d) {
+			let hostInfoData = hostInfoMap.get(d);
+			let center = [hostInfoData["longitude"], hostInfoData["latitude"]];
+			featureCollection.push(turf.circle(center, associatedMap.hostRadius, options));
+		})
+		let unionFeature = featureCollection[0];
+		for (var i = 0; i < featureCollection.length - 1; i++) {
+			unionFeature = turf.union(unionFeature, featureCollection[i+1]);
+		}
+
+		/* show on map */
+		this.HostSelectionRangeLayer  = L.geoJSON([unionFeature], {
+			style: this.HostRangeStyle,
+			pane: "geoLayer"
+		})
+		this.HostSelectionRangeLayer.addTo(this.map);
+	}
+}
 
 /* change following to interaction */
 recommendationMap.prototype.showSelectionArround = function() {
