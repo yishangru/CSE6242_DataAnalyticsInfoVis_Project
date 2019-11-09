@@ -2,7 +2,7 @@ function recommendationMap(divId, maxZoom) {
 	/* add divId of world map */
 	this.divId = divId;
 	/* add set to record which country to show */
-	this.countryShowSet = d3.set()
+	this.attractionSelectedSet = d3.set()
 	/* add present selection for local info demo */
 	this.currentSelection = null;
 	
@@ -213,7 +213,6 @@ recommendationMap.prototype.showAttractionMarker = function(whetherInitial) {
 				/* create marker group */
 				let attractionMarkerGroup = [
 					L.marker([attractionInfo.latitude, attractionInfo.longtitude]), // image or icon
-					L.marker([attractionInfo.latitude, attractionInfo.longtitude]), // place name
 					L.marker([attractionInfo.latitude, attractionInfo.longtitude]), // rating icon
 					L.marker([attractionInfo.latitude, attractionInfo.longtitude]), // checked marked
 				];
@@ -231,12 +230,11 @@ recommendationMap.prototype.showAttractionMarker = function(whetherInitial) {
 				attractionMarkerGroup[0].on("click", function(e){
 					let associatedMap = this.associatedMap
 					let checkedMarker = associatedMap.attractionMarkerMap.get(this.attractionId)[3];
-					let attractionRecord = attractionInfoMap.get(this.attractionId);
-					if (attractionRecord["selected"]){
-						attractionRecord["selected"] = false;
+					if (associatedMap.attractionSelectedSet.has(this.attractionId)){
+						associatedMap.attractionSelectedSet.remove(this.attractionId);
 						associatedMap.map.removeLayer(checkedMarker);
 					} else {
-						attractionRecord["selected"] = true;
+						associatedMap.attractionSelectedSet.add(this.attractionId);
 						checkedMarker.addTo(associatedMap.map);
 					}
 				})
@@ -260,9 +258,6 @@ recommendationMap.prototype.showAttractionMarker = function(whetherInitial) {
 		}));
 		attractionMarkerGroup[0].addTo(associatedMap.map);
 
-		/* 1 as name */
-
-
 		/* 2 as rating */
 		let attractionRating = Math.floor(attractionInfo["rating"])
 		let half = "";
@@ -273,20 +268,24 @@ recommendationMap.prototype.showAttractionMarker = function(whetherInitial) {
 		}
 
 		let accumentStar = (half == ""? attractionRating : attractionRating + 0.5); 
-		attractionMarkerGroup[2].setIcon( L.icon({
+		attractionMarkerGroup[1].setIcon( L.icon({
 			iconUrl: "./recommendationMap/Icon/rates/" + attractionRating + half + ".png",
 			iconSize: [Math.round(13 * accumentStar * scaleFactor), Math.round(15 * scaleFactor)],
 			iconAnchor: [-1 * Math.round((80 - 13 * accumentStar)/2 * scaleFactor), -1 * Math.round(60 * scaleFactor - 1)]
 		}));
-		attractionMarkerGroup[2].addTo(associatedMap.map);
+		attractionMarkerGroup[1].addTo(associatedMap.map);
 
 		/* 3 as checked symbol */
-		attractionMarkerGroup[3].setIcon( L.icon({
+		attractionMarkerGroup[2].setIcon( L.icon({
 			iconUrl: "./recommendationMap/Icon/selected.png",
 			iconSize: [Math.round(30 * scaleFactor), Math.round(30 * scaleFactor)],
 			iconAnchor: [-1 * Math.round((80 - 30)/2 * scaleFactor), -1 * Math.round(30 * scaleFactor)],
 			popupAnchor: [-3, 76]
 		}));
+		if (associatedMap.attractionSelectedSet.has(d)){
+			attractionMarkerGroup[2].addTo(associatedMap.map);
+		}
+
 		/* add the star and the title to map */
 	});
 }
