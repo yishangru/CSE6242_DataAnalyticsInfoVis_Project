@@ -199,7 +199,9 @@ recommendationMap.prototype.showAttractionMarker = function(whetherInitial) {
 
 	this.attractionAddedSet.values().forEach(function(d){
 		if (!associatedMap.attractionShowSet.has(d)) {
-			associatedMap.map.removeLayer(associatedMap.attractionMarkerMap.get(d));
+			associatedMap.attractionMarkerMap.get(d).forEach(function(d) {
+				associatedMap.map.removeLayer(d);
+			})
 			associatedMap.attractionAddedSet.remove(d);
 		}
 	});
@@ -207,27 +209,85 @@ recommendationMap.prototype.showAttractionMarker = function(whetherInitial) {
 	this.attractionShowSet.each(function(d){
 		let attractionInfo = attractionInfoMap.get(d);
 		if(!associatedMap.attractionAddedSet.has(d)){
-			if(!associatedMap.attractionMarkerMap.has(d))
-				associatedMap.attractionMarkerMap.set(d, L.marker([attractionInfo.latitude, attractionInfo.longtitude]))
+			if(!associatedMap.attractionMarkerMap.has(d)){
+				/* create marker group */
+				let attractionMarkerGroup = [
+					L.marker([attractionInfo.latitude, attractionInfo.longtitude]), // image or icon
+					L.marker([attractionInfo.latitude, attractionInfo.longtitude]), // place name
+					L.marker([attractionInfo.latitude, attractionInfo.longtitude]), // rating icon
+					L.marker([attractionInfo.latitude, attractionInfo.longtitude]), // checked marked
+				];
+
+				associatedMap.attractionMarkerMap.set(d, attractionMarkerGroup);
+				
+				attractionMarkerGroup[0].attractionId = d;
+				attractionMarkerGroup[0].associatedMap = associatedMap;
+				attractionMarkerGroup[0].on("mouseover", function(e){
+					// pop up tooltip
+				});
+				attractionMarkerGroup[0].on("mouseout", function(e){
+					// close tooltip
+				});
+				attractionMarkerGroup[0].on("click", function(e){
+					let associatedMap = this.associatedMap
+					let checkedMarker = associatedMap.attractionMarkerMap.get(this.attractionId)[3];
+					let attractionRecord = attractionInfoMap.get(this.attractionId);
+					if (attractionRecord["selected"]){
+						attractionRecord["selected"] = false;
+						associatedMap.map.removeLayer(checkedMarker);
+					} else {
+						attractionRecord["selected"] = true;
+						checkedMarker.addTo(associatedMap.map);
+					}
+				})
+			}
 			associatedMap.attractionAddedSet.add(d);
 		} else {
-			associatedMap.map.removeLayer(associatedMap.attractionMarkerMap.get(d));
+			associatedMap.attractionMarkerMap.get(d).forEach(function(d) {
+				associatedMap.map.removeLayer(d);
+			})
 		}
-		let attractionMarker = associatedMap.attractionMarkerMap.get(d);
+		let attractionMarkerGroup = associatedMap.attractionMarkerMap.get(d);
 		let scaleFactor = 1 + 6 * (associatedMap.map.getZoom()/(associatedMap.map.getMinZoom() + 2) - 1);
 		
-		attractionMarker.setIcon( L.icon({
-				iconUrl: "./data/" + attractionInfo["type"] + "s_pictures/resize/" + attractionInfo["id"] + ".jpg",
-				iconSize: [Math.round(80 * scaleFactor), Math.round(60 * scaleFactor)],
-				iconAnchor: [0, 0],
-				popupAnchor: [-3, 76]
+		/* 0 as image */
+		attractionMarkerGroup[0].setIcon( L.icon({
+			iconUrl: "./data/" + attractionInfo["type"] + "s_pictures/resize/" + attractionInfo["id"] + ".jpg",
+			iconSize: [Math.round(80 * scaleFactor), Math.round(60 * scaleFactor)],
+			iconAnchor: [0, 0],
+			popupAnchor: [-3, 76],
+			className: "mapIcon"
 		}));
+		attractionMarkerGroup[0].addTo(associatedMap.map);
+
+		/* 1 as name */
 
 
-		associatedMap.attractionMarkerMap.get(d).addTo(associatedMap.map);
-		
+		/* 2 as rating */
+		let attractionRating = Math.floor(attractionInfo["rating"])
+		let half = "";
+		if (attractionInfo["rating"] - attractionRating <= 0.8 && attractionInfo["rating"] - attractionRating >= 0.5){
+			half = "-half";
+		} else if (attractionInfo["rating"] - attractionRating > 0.8) {
+			attractionRating += 1;
+		}
+
+		let accumentStar = (half == ""? attractionRating : attractionRating + 0.5); 
+		attractionMarkerGroup[2].setIcon( L.icon({
+			iconUrl: "./recommendationMap/Icon/rates/" + attractionRating + half + ".png",
+			iconSize: [Math.round(13 * accumentStar * scaleFactor), Math.round(15 * scaleFactor)],
+			iconAnchor: [-1 * Math.round((80 - 13 * accumentStar)/2 * scaleFactor), -1 * Math.round(60 * scaleFactor - 1)]
+		}));
+		attractionMarkerGroup[2].addTo(associatedMap.map);
+
+		/* 3 as checked symbol */
+		attractionMarkerGroup[3].setIcon( L.icon({
+			iconUrl: "./recommendationMap/Icon/selected.png",
+			iconSize: [Math.round(30 * scaleFactor), Math.round(30 * scaleFactor)],
+			iconAnchor: [-1 * Math.round((80 - 30)/2 * scaleFactor), -1 * Math.round(30 * scaleFactor)],
+			popupAnchor: [-3, 76]
+		}));
 		/* add the star and the title to map */
-
 	});
 }
 

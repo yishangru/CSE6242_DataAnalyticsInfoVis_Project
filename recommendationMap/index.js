@@ -42,7 +42,8 @@ function attractionProcess(d) {
 		longtitude: +d.longtitude,
 		rating: +d.rating,
 		introduction: d.introduction,
-		website: d.website
+		website: d.website,
+		selected: false
 	}
 }
 
