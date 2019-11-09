@@ -9,8 +9,8 @@ function recommendationMap(divId, maxZoom) {
 	/* declare meta map attribute */
 	var minZoom = 10;
 	this.mapInitialCenter = new L.LatLng(36.16991, -115.139832);
-	this.mapMaxBounds = L.latLngBounds(L.latLng(28.16991, -118.139832), L.latLng(44.16991, -112.139832));
-	//this.mapMaxBounds = L.latLngBounds(L.latLng(36, -115.15), L.latLng(36.34, -115.13));
+	this.mapMaxBoundsZoom = L.latLngBounds(L.latLng(28.16991, -118.139832), L.latLng(44.16991, -112.139832));
+	this.mapMaxBounds = L.latLngBounds(L.latLng(36, -115.15), L.latLng(36.34, -115.13));
 
 
 	d3.select("#" + this.divId).style("width", (window.screen.availWidth - 4) + "px").style("height", (window.screen.availHeight - 75) + "px");
@@ -214,10 +214,10 @@ recommendationMap.prototype.showAttractionMarker = function(whetherInitial) {
 			associatedMap.map.removeLayer(associatedMap.attractionMarkerMap.get(d));
 		}
 		let attractionMarker = associatedMap.attractionMarkerMap.get(d);
-		let scaleFactor = 1 + 5 * (associatedMap.map.getZoom()/(associatedMap.map.getMinZoom() + 2) - 1);
+		let scaleFactor = 1 + 6 * (associatedMap.map.getZoom()/(associatedMap.map.getMinZoom() + 2) - 1);
 		attractionMarker.setIcon( L.icon({
 				iconUrl: "./data/" + attractionInfo["type"] + "s_pictures/resize/" + attractionInfo["id"] + ".jpg",
-				iconSize: [Math.round(60 * scaleFactor), Math.round(45 * scaleFactor)],
+				iconSize: [Math.round(80 * scaleFactor), Math.round(60 * scaleFactor)],
 				iconAnchor: [0, 0],
 				popupAnchor: [-3, 76]
 		}))
@@ -285,8 +285,9 @@ function updateZoomDemo(e) {
 
 	let mapTitleGroup = geoSvg.select("#" + associatedMap.divId + "mapTitleGroup");
 
-	if (this.getZoom()  <= this.getMinZoom() + 1){
+	if (this.getZoom()  < this.getMinZoom() + 1){
 		/* display welcome text */
+		associatedMap.map.setMaxBounds(associatedMap.mapMaxBounds);
 		associatedMap.map.setView(associatedMap.mapInitialCenter);
 		if (mapTitleGroup.empty()){
 			mapTitleGroup = geoSvg.append("g").attr("id", associatedMap.divId + "mapTitleGroup");
@@ -295,19 +296,27 @@ function updateZoomDemo(e) {
 			mapTitleGroup.append("text").attr("id", associatedMap.divId + "mapTitleText")
 				.text("Explore Local Greatness");
 		};
-		let mapCenter = associatedMap.map.latLngToLayerPoint(associatedMap.mapInitialCenter);;
+
 		let mapTitleText = mapTitleGroup.select("#" + associatedMap.divId + "mapTitleText");
 		let mapTitleImage = mapTitleGroup.select("#" + associatedMap.divId + "mapTitleImage");
 
+		let mapBound = associatedMap.map.getBounds();
+		let mapCenter = associatedMap.map.latLngToLayerPoint(associatedMap.mapInitialCenter);
+		mapTitleImage.style("width", "460px").style("height", "430px")
+			.attr("transform", "rotate(-8,100,100)translate(" + (mapCenter.x - 450) + "," + (mapCenter.y - 320) + ")");
+		mapTitleText.attr("transform", "translate(" + (mapCenter.x - 50) + "," + (mapCenter.y + 300) + ")").style("font-size", "220px");
+		/* 
 		if (this.getZoom() == this.getMinZoom()) {
 			mapTitleImage.style("width", "460px").style("height", "430px")
-				.attr("transform", "rotate(-8,100,100)translate(" + (mapCenter.x - 450) + "," + (mapCenter.y - 300) + ")");
+				.attr("transform", "rotate(-8,100,100)translate(" + (mapCenter.x - 500) + "," + (mapCenter.y - 300) + ")");
 			mapTitleText.attr("transform", "translate(" + (mapCenter.x - 50) + "," + (mapCenter.y + 300) + ")").style("font-size", "220px");
 		} else if (this.getZoom() == this.getMinZoom() + 1) {
 			mapTitleImage.style("width", "460px").style("height", "440px")
 				.attr("transform", "rotate(-8,100,100)translate(" + (mapCenter.x - 600) + "," + (mapCenter.y - 350) + ")");
 			mapTitleText.attr("transform", "translate(" + (mapCenter.x - 50) + "," + (mapCenter.y + 280) + ")").style("font-size", "200px");
 		}
+		*/
+
 		associatedMap.attractionShowSet.clear();
 		associatedMap.restaurantShowSet.clear();
 		associatedMap.hostShowSet.clear();
@@ -315,13 +324,14 @@ function updateZoomDemo(e) {
 		associatedMap.showRestaurantMarker(false);
 		associatedMap.showHostMarker(false);
 	} else {
+		associatedMap.map.setMaxBounds(associatedMap.mapMaxBoundsZoom);
 		/* remove welcome text */
 		if (!mapTitleGroup.empty()) {
 			mapTitleGroup.remove();
 		}
-		associatedMap.showAttractionMarker(this.getZoom() <= this.getMinZoom() + 2? true : false);
-		associatedMap.showRestaurantMarker(this.getZoom() <= this.getMinZoom() + 2? true : false);
-		associatedMap.showHostMarker(this.getZoom() <= this.getMinZoom() + 2? true : false);
+		associatedMap.showAttractionMarker(this.getZoom() <= this.getMinZoom() + 1? true : false);
+		associatedMap.showRestaurantMarker(this.getZoom() <= this.getMinZoom() + 1? true : false);
+		associatedMap.showHostMarker(this.getZoom() <= this.getMinZoom() + 1? true : false);
 	}
 }
 
