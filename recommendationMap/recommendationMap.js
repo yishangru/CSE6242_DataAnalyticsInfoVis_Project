@@ -469,7 +469,7 @@ function expandInfoSection(e){
 	let buttonClass = d3.select(this).attr("class").toString();
 
 	if (d3.select(this.parentNode).style("height") !== "42px") {
-		d3.select(this.parentNode).select("div").remove();
+		d3.select(this.parentNode).select(".showPreference").remove();
 		d3.select(this.parentNode).style("height", "42px");
 		if (buttonClass === "preferenceButton") {
 			d3.select(this).text("▲");
@@ -478,6 +478,14 @@ function expandInfoSection(e){
 		}
 		return;
 	}
+
+	/*
+	localPointdiv.append("button")
+			.attr("type", "button")
+			.attr("class", "localPointButton")
+			.text("▼")
+			.on("click", expandInfoSection);
+	*/
 
 	if (buttonClass === "yelpButton") {
 		d3.select(this.parentNode).style("height", "350px");
@@ -497,7 +505,7 @@ function expandInfoSection(e){
 	} else if (buttonClass === "preferenceButton") {
 		d3.select(this.parentNode).style("height", "400px");
 		d3.select(this).text("▼");
-		let appenddiv = d3.select(this.parentNode).append("div");
+		let appenddiv = d3.select(this.parentNode).append("div").attr("class", "showPreference");
 		appenddiv.html("<p>This is for preference search<br/>Not Implement Yet</p>");
 	}
 }
