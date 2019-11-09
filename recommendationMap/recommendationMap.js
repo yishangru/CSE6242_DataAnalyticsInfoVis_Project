@@ -1,8 +1,14 @@
 function recommendationMap(divId, maxZoom) {
 	/* add divId of world map */
 	this.divId = divId;
-	/* add set to record which country to show */
-	this.attractionSelectedSet = d3.set()
+
+	/* add set to record which attraction to show */
+	this.attractionSelectedSet = d3.set();
+	/* add set to record the selected restaurant */
+	this.restaurantSelectedSet = d3.set();
+	/* add set to record the selected hosts */
+	this.hostSelectedSet = d3.set();
+	
 	/* add present selection for local info demo */
 	this.currentSelection = null;
 	/* radius for show range */
@@ -13,7 +19,6 @@ function recommendationMap(divId, maxZoom) {
 	this.mapInitialCenter = new L.LatLng(36.16991, -115.139832);
 	this.mapMaxBoundsZoom = L.latLngBounds(L.latLng(28.16991, -118.139832), L.latLng(44.16991, -112.139832));
 	this.mapMaxBounds = L.latLngBounds(L.latLng(36, -115.15), L.latLng(36.34, -115.13));
-
 
 	d3.select("#" + this.divId).style("width", (window.screen.availWidth - 4) + "px").style("height", (window.screen.availHeight - 75) + "px");
 	this.map = L.map(divId, {
@@ -162,15 +167,12 @@ function recommendationMap(divId, maxZoom) {
 	// add set for showing marker
 	this.attractionMarkerMap = d3.map();
 	this.attractionShowSet = d3.set();
-	this.attractionAddedSet = d3.set();
 
 	this.restaurantMarkerMap = d3.map();
 	this.restaurantShowSet = d3.set();
-	this.restaurantAddedSet = d3.set();
 
 	this.hostMarkerMap = d3.map();
 	this.hostShowSet = d3.set();
-	this.hostAddedSet = d3.set();
 
 	// default layer order: tile, GeoJSON, Marker shadows, Marker icons, Popups
 	this.tileLayer.addTo(this.map);
@@ -197,82 +199,82 @@ recommendationMap.prototype.rangeStyle = function(f) {
 /* for map function */
 recommendationMap.prototype.initialMap = function() {
 	this.map.on('zoomend', updateZoomDemo);
+	let associatedMap = this;
+	attractionInfoMap.keys().forEach(function(d) {
+		associatedMap.attractionShowSet.add(d);
+	})
 	updateZoomDemo.call(this.map);
 }
 
-recommendationMap.prototype.showAttractionMarker = function(whetherInitial) {
+/* update all marker in show set */
+recommendationMap.prototype.updateAttractionMarker = function() {
 	let associatedMap = this;
-	if (whetherInitial) {
-		attractionInfoMap.keys().forEach(function(d) {
-			associatedMap.attractionShowSet.add(d);
-		})
-	}
-
-	this.attractionAddedSet.values().forEach(function(d){
-		if (!associatedMap.attractionShowSet.has(d)) {
-			associatedMap.attractionMarkerMap.get(d).forEach(function(d) {
-				associatedMap.map.removeLayer(d);
-			})
-			associatedMap.attractionAddedSet.remove(d);
-		}
-	});
-
 	this.attractionShowSet.each(function(d){
-		let attractionInfo = attractionInfoMap.get(d);
-		if(!associatedMap.attractionAddedSet.has(d)){
-			if(!associatedMap.attractionMarkerMap.has(d)){
-				/* create marker group */
-				let attractionMarkerGroup = [
-					L.marker([attractionInfo.latitude, attractionInfo.longitude]), // image or icon
-					L.marker([attractionInfo.latitude, attractionInfo.longitude]), // rating icon
-					L.marker([attractionInfo.latitude, attractionInfo.longitude]), // add preference list
-					L.marker([attractionInfo.latitude, attractionInfo.longitude]), // checked marked
-				];
+		associatedMap.updateAttractionMarkerShow(d);
+	});
+}
 
-				associatedMap.attractionMarkerMap.set(d, attractionMarkerGroup);
-				
-				attractionMarkerGroup[0].attractionId = d;
-				attractionMarkerGroup[0].associatedMap = associatedMap;
-
-				attractionMarkerGroup[0].on("mouseover", function(e){
-					this.openPopup();
-				});
-				attractionMarkerGroup[0].on("mouseout", function(e){
-					this.closePopup();
-				});
-				attractionMarkerGroup[0].on("click", function(e){
-					let associatedMap = this.associatedMap
-					let checkedMarker = associatedMap.attractionMarkerMap.get(this.attractionId)[3];
-					if (associatedMap.attractionSelectedSet.has(this.attractionId)){
-						associatedMap.attractionSelectedSet.remove(this.attractionId);
-						associatedMap.map.removeLayer(checkedMarker);
-					} else {
-						associatedMap.attractionSelectedSet.add(this.attractionId);
-						checkedMarker.addTo(associatedMap.map);
-					}
-					associatedMap.showAttractionRange();
-					associatedMap.showRestaurantMarker(true);
-					associatedMap.showHostMarker(true);
-				})
-
-				attractionMarkerGroup[2].associatedMap = associatedMap;
-				attractionMarkerGroup[2].attractionId = d;
-				attractionMarkerGroup[2].on("click", function(e){
-					/* add to preference list */
-				})
-			}
-			associatedMap.attractionAddedSet.add(d);
-		} else {
-			associatedMap.attractionMarkerMap.get(d).forEach(function(d) {
-				associatedMap.map.removeLayer(d);
-			})
-		}
-		let attractionMarkerGroup = associatedMap.attractionMarkerMap.get(d);
-		let scaleFactor = 1 + 6 * (associatedMap.map.getZoom()/(associatedMap.map.getMinZoom() + 2) - 1);
+/* update one marker in show set, if not exist, create */
+recommendationMap.prototype.updateAttractionMarkerShow = function(attractionId) {
+	let associatedMap = this;
+	let attractionInfo = attractionInfoMap.get(attractionId);
 		
-		/* 0 as image */
-		let widthIcon = 80;
-		let heightIcon = 60;
+	if(!associatedMap.attractionMarkerMap.has(attractionId)){
+		/* create marker group */
+		let attractionMarkerGroup = [
+			L.marker([attractionInfo.latitude, attractionInfo.longitude]), // image or icon
+			L.marker([attractionInfo.latitude, attractionInfo.longitude]), // rating icon
+			L.marker([attractionInfo.latitude, attractionInfo.longitude]), // add preference list
+			L.marker([attractionInfo.latitude, attractionInfo.longitude]), // checked marked
+		];
+
+		console.log(attractionId);
+		associatedMap.attractionMarkerMap.set(attractionId, attractionMarkerGroup);
+		
+		attractionMarkerGroup[0].attractionId = attractionId;
+		attractionMarkerGroup[0].associatedMap = associatedMap;
+
+		attractionMarkerGroup[0].on("mouseover", function(e){
+			this.openPopup();
+		});
+		attractionMarkerGroup[0].on("mouseout", function(e){
+			this.closePopup();
+		});
+		attractionMarkerGroup[0].on("click", function(e){
+			let associatedMap = this.associatedMap
+			let checkedMarker = associatedMap.attractionMarkerMap.get(this.attractionId)[3];
+			
+			/* if already selected, change to unselected */
+			if (associatedMap.attractionSelectedSet.has(this.attractionId)){
+				associatedMap.attractionSelectedSet.remove(this.attractionId);
+				associatedMap.map.removeLayer(checkedMarker);
+			} else {
+				associatedMap.attractionSelectedSet.add(this.attractionId);
+				checkedMarker.addTo(associatedMap.map);
+			}
+			associatedMap.showSelectedAttractionRange();
+			associatedMap.showRestaurantMarker(true);
+			associatedMap.showHostMarker(true);
+		})
+
+		attractionMarkerGroup[2].associatedMap = associatedMap;
+		attractionMarkerGroup[2].attractionId = attractionId;
+		attractionMarkerGroup[2].on("click", function(e){
+			/* add to preference list, not implement yet*/
+		})
+		console.log(associatedMap.attractionMarkerMap.get(attractionId));
+	}
+	/* remove already added marker for enlarge zoom event */
+	associatedMap.attractionMarkerMap.get(attractionId).forEach(function(d) {
+		associatedMap.map.removeLayer(d);
+	})
+
+	let widthIcon = 80;
+	let heightIcon = 60;
+	let attractionMarkerGroup = associatedMap.attractionMarkerMap.get(attractionId);
+	let scaleFactor = 1 + 6 * (associatedMap.map.getZoom()/(associatedMap.map.getMinZoom() + 2) - 1);
+	
+	/* 0 as image */
 		attractionMarkerGroup[0].setIcon( L.icon({
 			iconUrl: "./data/" + attractionInfo["type"] + "s_pictures/resize/" + attractionInfo["id"] + ".jpg",
 			iconSize: [Math.round(widthIcon * scaleFactor), Math.round(heightIcon * scaleFactor)],
@@ -291,7 +293,7 @@ recommendationMap.prototype.showAttractionMarker = function(whetherInitial) {
 		})
 		attractionMarkerGroup[0].addTo(associatedMap.map);
 
-		/* 2 as rating */
+	/* 1 as rating */
 		let attractionRating = Math.floor(attractionInfo["rating"])
 		let half = "";
 		if (attractionInfo["rating"] - attractionRating <= 0.8 && attractionInfo["rating"] - attractionRating >= 0.5){
@@ -308,7 +310,7 @@ recommendationMap.prototype.showAttractionMarker = function(whetherInitial) {
 		}));
 		attractionMarkerGroup[1].addTo(associatedMap.map);
 
-		/* 2 as add preference list */
+	/* 2 as add preference list */
 		attractionMarkerGroup[2].setIcon( L.icon({
 			iconUrl: "./recommendationMap/Icon/plus.png",
 			iconSize: [Math.round(30 * scaleFactor), Math.round(30 * scaleFactor)],
@@ -317,22 +319,20 @@ recommendationMap.prototype.showAttractionMarker = function(whetherInitial) {
 		}));
 		attractionMarkerGroup[2].addTo(associatedMap.map);
 
-		/* 3 as checked symbol */
+	/* 3 as checked symbol */
 		attractionMarkerGroup[3].setIcon( L.icon({
 			iconUrl: "./recommendationMap/Icon/selected.png",
 			iconSize: [Math.round(30 * scaleFactor), Math.round(30 * scaleFactor)],
 			iconAnchor: [ Math.round(30/2 * scaleFactor), -1 * Math.round((30 - heightIcon/2) * scaleFactor)],
 			popupAnchor: [-3, 76]
 		}));
-		if (associatedMap.attractionSelectedSet.has(d)){
+		if (associatedMap.attractionSelectedSet.has(attractionId)){
 			attractionMarkerGroup[3].addTo(associatedMap.map);
 		}
-
-		/* add the star and the title to map */
-	});
 }
 
-recommendationMap.prototype.showAttractionRange = function() {
+/* show geo range for selected attraction */
+recommendationMap.prototype.showSelectedAttractionRange = function() {
 	let associatedMap = this;
 	/* 	this.attractionSelectedSet changed, use 5km for testing */
 	if(this.selectionRangeLayer != undefined) {
@@ -340,7 +340,7 @@ recommendationMap.prototype.showAttractionRange = function() {
 	}
 
 	/* change to take input later */
-	if (this.attractionShowSet.size() >= 1){
+	if (this.attractionSelectedSet.size() >= 1){
 		let featureCollection = [];
 		let options = {steps: 12, units: 'kilometers'};
 		this.attractionSelectedSet.each(function(d) {
@@ -364,7 +364,8 @@ recommendationMap.prototype.showAttractionRange = function() {
 	}
 }
 
-recommendationMap.prototype.showRestaurantMarker = function(whetherUpdate) {
+
+recommendationMap.prototype.updateRestaurantMarker = function(whetherUpdate) {
 	/* 
 	When new attraction is selected, read selection;
 	For all attraction selection, update them
@@ -376,7 +377,7 @@ recommendationMap.prototype.showRestaurantMarker = function(whetherUpdate) {
 	}
 }
 
-recommendationMap.prototype.showHostMarker = function(whetherUpdate) {
+recommendationMap.prototype.updateHostMarker = function(whetherUpdate) {
 	/* 
 	When new attraction is selected, read selection;
 	For all attraction selection, update them
@@ -445,23 +446,36 @@ function updateZoomDemo(e) {
 			mapTitleText.attr("transform", "translate(" + (mapCenter.x - 50) + "," + (mapCenter.y + 280) + ")").style("font-size", "200px");
 		}
 		*/
+
+		/* clear all selectedSet, back to original view */
 		associatedMap.attractionSelectedSet.clear();
-		associatedMap.attractionShowSet.clear();
+		
+		associatedMap.restaurantSelectedSet.clear();
 		associatedMap.restaurantShowSet.clear();
+		
+		associatedMap.hostSelectedSet.clear();
 		associatedMap.hostShowSet.clear();
-		associatedMap.showAttractionMarker(false);
-		associatedMap.showRestaurantMarker(true);
-		associatedMap.showHostMarker(true);
-		associatedMap.showAttractionRange();
+
+		/* update for marker */
+		associatedMap.updateAttractionMarker();
+		associatedMap.showSelectedAttractionRange();
+		
+		/* update for restaurant and host */
+		associatedMap.updateRestaurantMarker(true);
+		associatedMap.updateHostMarker(true);
 	} else {
+		/* not back to original states */
 		associatedMap.map.setMaxBounds(associatedMap.mapMaxBoundsZoom);
+		
 		/* remove welcome text */
 		if (!mapTitleGroup.empty()) {
 			mapTitleGroup.remove();
 		}
-		associatedMap.showAttractionMarker(this.getZoom() == this.getMinZoom() + 1? true : false);
-		associatedMap.showRestaurantMarker(false);
-		associatedMap.showHostMarker(false);
+
+		/* selected set not change */
+		associatedMap.updateAttractionMarker();
+		associatedMap.updateRestaurantMarker(false);
+		associatedMap.updateHostMarker(false);
 	}
 }
 
@@ -469,39 +483,62 @@ function expandInfoSection(e){
 	let buttonClass = d3.select(this).attr("class").toString();
 
 	if (d3.select(this.parentNode).style("height") !== "42px") {
-		d3.select(this.parentNode).select(".showPreference").remove();
 		d3.select(this.parentNode).style("height", "42px");
 		if (buttonClass === "preferenceButton") {
 			d3.select(this).text("▲");
+			d3.select(this.parentNode).select(".showPreference").remove();
 		} else {
 			d3.select(this).text("▼");
+			d3.select(this.parentNode).select(".infoTable").remove();
 		}
 		return;
 	}
 
-	/*
-	localPointdiv.append("button")
-			.attr("type", "button")
-			.attr("class", "localPointButton")
-			.text("▼")
-			.on("click", expandInfoSection);
-	*/
-
 	if (buttonClass === "yelpButton") {
 		d3.select(this.parentNode).style("height", "350px");
 		d3.select(this).text("▲");
-		let appenddiv = d3.select(this.parentNode).append("div");
-		appenddiv.html("<p>test test test <br/> test test test</p>");
+		let appenddiv = d3.select(this.parentNode).append("div").attr("class", "infoTable");
+		appenddiv.selectAll("button").data(topRestaurants)
+			.enter().append("button").attr("class", "restaurantInfo").style("width", "280px").style("height", "27px").text(d=>d.name + "--" + d.star + "/5")
+			.on("click", function(e) {
+				/* add as selection, set map view, zoom */
+
+			});
+		appenddiv.append("p").text("To Be Continued ......");
 	} else if (buttonClass === "airbnbButton") {
 		d3.select(this.parentNode).style("height", "350px");
 		d3.select(this).text("▲");
-		let appenddiv = d3.select(this.parentNode).append("div");
-		appenddiv.html("<p>test test test <br/> test test test</p>");
+		let appenddiv = d3.select(this.parentNode).append("div").attr("class", "infoTable");
+		appenddiv.selectAll("button").data(topHosts)
+			.enter().append("button").attr("class", "hostInfo").style("width", "280px").style("height", "27px").text(function(d) {
+				if (d.name.length >= 20) {
+					return d.type + "-" + d.host_id + "--" + (d.rating/20) + "/5"
+				} else {
+					return d.name + "--" + (d.rating/20) + "/5";
+				}
+			})
+			.on("click", function(e) {
+				/* add as selection, set map view, zoom */
+				recommendationMap.attractionSelectedSet.add()
+				recommendationMap.showAttractionMarker(false);
+				recommendationMap.showRestaurantMarker(true);
+				recommendationMap.showHostMarker(true);
+				recommendationMap.showAttractionRange();
+
+			});
+		appenddiv.append("p").text("To Be Continued ......");
 	} else if (buttonClass === "localPointButton") {
 		d3.select(this.parentNode).style("height", "350px");
 		d3.select(this).text("▲");
-		let appenddiv = d3.select(this.parentNode).append("div");
-		appenddiv.html("<p>test test test <br/> test test test</p>");
+		let appenddiv = d3.select(this.parentNode).append("div").attr("class", "infoTable");
+		appenddiv.selectAll("button").data(topAttractions)
+			.enter().append("button").attr("class", "attractionInfo").style("width", "280px").style("height", "27px").text(d=>d.name + "--" + d.rating + "/5")
+			.on("click", function(e) {
+				/* add as selection, set map view, zoom */
+
+
+			});
+		appenddiv.append("p").text("To Be Continued ......");
 	} else if (buttonClass === "preferenceButton") {
 		d3.select(this.parentNode).style("height", "400px");
 		d3.select(this).text("▼");
@@ -512,7 +549,11 @@ function expandInfoSection(e){
 /* end map interaction */
 
 
+/*
+To-do-list:
 
-/* wait to add
-1. use turf.buffer to get a shape cover the area within specific distance from center point / circle
+1. Add preference list update
+2. Add radius change 
+3. Add support for preference search
+
 */
