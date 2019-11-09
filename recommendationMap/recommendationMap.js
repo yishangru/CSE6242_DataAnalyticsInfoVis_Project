@@ -13,6 +13,10 @@ function recommendationMap(divId, maxZoom) {
 	this.currentSelection = null;
 	
 	/* radius for show range */
+	this.attractionRadiusDef = 5;
+	this.restaurantRadiusDef = 3;
+	this.hostRadiusDef = 3;
+
 	this.attractionRadius = 5;
 	this.restaurantRadius = 3;
 	this.hostRadius = 3;
@@ -253,7 +257,6 @@ recommendationMap.prototype.updateAttractionMarkerShow = function(attractionId) 
 			L.marker([attractionInfo.latitude, attractionInfo.longitude]), // checked marked
 		];
 
-		console.log(attractionId);
 		associatedMap.attractionMarkerMap.set(attractionId, attractionMarkerGroup);
 		
 		attractionMarkerGroup[0].attractionId = attractionId;
@@ -274,12 +277,14 @@ recommendationMap.prototype.updateAttractionMarkerShow = function(attractionId) 
 				associatedMap.attractionSelectedSet.remove(this.attractionId);
 				associatedMap.map.removeLayer(checkedMarker);
 			} else {
+				associatedMap.generateAroundInfo(this.attractionId);
 				associatedMap.attractionSelectedSet.add(this.attractionId);
 				checkedMarker.addTo(associatedMap.map);
 			}
 			associatedMap.showSelectedAttractionRange();
-			associatedMap.showRestaurantMarker(true);
-			associatedMap.showHostMarker(true);
+
+			associatedMap.updateRestaurantMarker(true);
+			associatedMap.updateHostMarker(true);
 		})
 
 		attractionMarkerGroup[2].associatedMap = associatedMap;
@@ -287,7 +292,6 @@ recommendationMap.prototype.updateAttractionMarkerShow = function(attractionId) 
 		attractionMarkerGroup[2].on("click", function(e){
 			/* add to preference list, not implement yet*/
 		})
-		console.log(associatedMap.attractionMarkerMap.get(attractionId));
 	}
 	/* remove already added marker for enlarge zoom event */
 	associatedMap.attractionMarkerMap.get(attractionId).forEach(function(d) {
@@ -356,6 +360,73 @@ recommendationMap.prototype.updateAttractionMarkerShow = function(attractionId) 
 		}
 }
 
+
+/* generate distance for restaurant and host */
+recommendationMap.prototype.generateAroundInfo = function(attractionId) {
+	let associatedMap = this;
+	let attractionInfoData = attractionInfoMap.get(attractionId);
+	/* first check default km range, deafult as 5, 3, 3 */
+	if (!attractionAroundMap.has(attractionId)) {
+		attractionAroundMap.set(attractionId, {restaurants: d3.map(), hosts: d3.map()});
+	}
+	attractionAroundData = attractionAroundMap.get(attractionId);
+	if (!attractionAroundData["restaurants"].has(associatedMap.attractionRadiusDef)) {
+		let aroundRestaurants = d3.set();
+		let from = turf.point([attractionInfoData["longitude"], attractionInfoData["latitude"]]);
+		let options = {units: 'kilometers'};
+		restaurantInfoMap.each(function(d) {
+			let to = turf.point([d["longitude"], d["latitude"]]);
+			if (turf.distance(from, to, options) <= associatedMap.attractionRadiusDef) {
+				aroundRestaurants.add(d["restaurant_id"]);
+			} 
+		})
+		attractionAroundData["restaurants"].set(associatedMap.attractionRadiusDef, aroundRestaurants);
+	}
+
+	if (!attractionAroundData["hosts"].has(associatedMap.attractionRadiusDef)) {
+		let aroundHosts = d3.set();
+		let from = turf.point([attractionInfoData["longitude"], attractionInfoData["latitude"]]);
+		let options = {units: 'kilometers'};
+		hostInfoMap.each(function(d) {
+			let to = turf.point([d["longitude"], d["latitude"]]);
+			if (turf.distance(from, to, options) <= associatedMap.attractionRadiusDef) {
+				console.log(turf.distance(from, to, options));
+				aroundHosts.add(d["host_id"]);
+			} 
+		})
+		attractionAroundData["hosts"].set(associatedMap.attractionRadiusDef, aroundHosts);
+	}
+
+	if (!attractionAroundData["restaurants"].has(associatedMap.attractionRadius)) {
+		let aroundRestaurants = d3.set();
+		let from = turf.point([attractionInfoData["longitude"], attractionInfoData["latitude"]]);
+		let options = {units: 'kilometers'};
+		attractionAroundData["restaurants"].get(associatedMap.attractionRadiusDef).each(function(d) {
+			let restaurantInfoData = restaurantInfoMap.get(d);
+			let to = turf.point([restaurantInfoData["longitude"], restaurantInfoData["latitude"]]);
+			if (turf.distance(from, to, options) <= associatedMap.attractionRadius) {
+				aroundRestaurants.add(restaurantInfoData["restaurant_id"]);
+			} 
+		})
+		attractionAroundData["restaurants"].set(associatedMap.attractionRadius, aroundRestaurants);
+	}
+
+	if (!attractionAroundData["hosts"].has(associatedMap.attractionRadius)) {
+		let aroundHosts = d3.set();
+		let from = turf.point([attractionInfoData["longitude"], attractionInfoData["latitude"]]);
+		let options = {units: 'kilometers'};
+		attractionAroundData["hosts"].get(associatedMap.attractionRadiusDef).each(function(d) {
+			let hostInfoData = hostInfoMap.get(d);
+			let to = turf.point([hostInfoData["longitude"], hostInfoData["latitude"]]);
+			if (turf.distance(from, to, options) <= associatedMap.attractionRadius) {
+				aroundHosts.add(hostInfoData["host_id"]);
+			} 
+		})
+		attractionAroundData["hosts"].set(associatedMap.attractionRadius, aroundHosts);
+	}
+}
+
+
 /* show geo range for selected attraction */
 recommendationMap.prototype.showSelectedAttractionRange = function() {
 	let associatedMap = this;
@@ -394,7 +465,7 @@ recommendationMap.prototype.updateRestaurantMarker = function(whetherUpdate) {
 	For all attraction selection, update them
 	*/
 	if (whetherUpdate) {
-		
+
 	} else {
 		/* just dealing with zoom */
 	}
@@ -404,7 +475,7 @@ recommendationMap.prototype.updateRestaurantMarkerShow = function(restaurantId) 
 
 }
 
-/* show geo range for selected attraction */
+/* show geo range for selected restaurant */
 recommendationMap.prototype.showSelectedRestaurantRange = function() {
 	let associatedMap = this;
 	/* 	this.attractionSelectedSet changed, use 5km for testing */
@@ -452,6 +523,7 @@ recommendationMap.prototype.updateHostMarkerShow = function(hostId) {
 	
 }
 
+/* show geo range for selected host */
 recommendationMap.prototype.showSelectedHostsRange = function() {
 	let associatedMap = this;
 	/* 	this.attractionSelectedSet changed, use 5km for testing */
@@ -482,19 +554,6 @@ recommendationMap.prototype.showSelectedHostsRange = function() {
 	}
 }
 
-/* change following to interaction */
-recommendationMap.prototype.showSelectionArround = function() {
-	/* with selection, showing the item around it */
-	if (this.currentSelection) {
-
-	} else {
-		this.map.setZoom(this.map.getMinZoom() + 1);
-		/* for show all info */
-		var associatedMap = this;
-		/* show map title */
-		updateMapTitle.call(this.map);
-	}
-}
 /* end map function */
 
 /* for map interaction */
@@ -611,11 +670,6 @@ function expandInfoSection(e){
 			})
 			.on("click", function(e) {
 				/* add as selection, set map view, zoom */
-				recommendationMap.attractionSelectedSet.add()
-				recommendationMap.showAttractionMarker(false);
-				recommendationMap.showRestaurantMarker(true);
-				recommendationMap.showHostMarker(true);
-				recommendationMap.showAttractionRange();
 
 			});
 		appenddiv.append("p").text("To Be Continued ......");
@@ -627,8 +681,22 @@ function expandInfoSection(e){
 			.enter().append("button").attr("class", "attractionInfo").style("width", "280px").style("height", "27px").text(d=>d.name + "--" + d.rating + "/5")
 			.on("click", function(e) {
 				/* add as selection, set map view, zoom */
-
-
+				let attractionInfoData = d3.select(this).datum();
+				if (!recommendationMap.attractionSelectedSet.has(attractionInfoData["attraction_id"])){
+					recommendationMap.generateAroundInfo(attractionInfoData["attraction_id"]);
+					d3.select(this).style("background", "rgba(255,255,255, 1)")
+					recommendationMap.attractionSelectedSet.add(attractionInfoData["attraction_id"]);
+					recommendationMap.updateAttractionMarkerShow(attractionInfoData["attraction_id"]);
+					recommendationMap.showSelectedAttractionRange();
+					recommendationMap.map.setZoom(12);
+					recommendationMap.map.setView(new L.LatLng(attractionInfoData["latitude"], attractionInfoData["longitude"]));
+				} else {
+					d3.select(this).style("background", "rgba(255,255,255, 0.1)")
+					recommendationMap.attractionSelectedSet.remove(attractionInfoData["attraction_id"]);
+					recommendationMap.updateAttractionMarkerShow(attractionInfoData["attraction_id"]);
+					recommendationMap.showSelectedAttractionRange();
+					recommendationMap.map.setView(recommendationMap.mapInitialCenter);
+				}
 			});
 		appenddiv.append("p").text("To Be Continued ......");
 	} else if (buttonClass === "preferenceButton") {

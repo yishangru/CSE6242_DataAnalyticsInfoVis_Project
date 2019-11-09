@@ -16,12 +16,11 @@ var topHosts;
 
 /*
 structure as {
-	attractions: {0-1: array, 1-2: array, 2-3: array, 3-4: array, 4-5: array, 5-6: array},
-	restaurants: {0-1: array, 1-2: array, 2-3: array, 3-4: array, 4-5: array, 5-6: array},
+	restaurants: {0-1: set(), 1-2: set(), 2-3:set(), 3-4: set(), 4-5: set(), 5-6:set()},
 	hosts: {0-1: array, 1-2: array, 2-3: array, 3-4: array, 4-5: array, 5-6: array}
 }
 */
-var attractionAroudMap = d3.map();
+var attractionAroundMap = d3.map();
 
 Promise.all([
 		d3.csv(dataPath.attractions, attractionProcess),
@@ -40,6 +39,13 @@ Promise.all([
 			.object(data[1]);
 		data[1].forEach(function(d) {
 			restaurantInfoMap.set(d.restaurant_id, restaurantInfoData[d.restaurant_id][0])
+		})
+
+		let hostInfoData = d3.nest()
+			.key(d=>d.host_id)
+			.object(data[2]);
+		data[2].forEach(function(d) {
+			hostInfoMap.set(d.host_id, hostInfoData[d.host_id][0])
 		})
 
 		data[0].sort(function(x, y){
