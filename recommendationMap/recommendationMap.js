@@ -215,13 +215,19 @@ recommendationMap.prototype.showAttractionMarker = function(whetherInitial) {
 		}
 		let attractionMarker = associatedMap.attractionMarkerMap.get(d);
 		let scaleFactor = 1 + 6 * (associatedMap.map.getZoom()/(associatedMap.map.getMinZoom() + 2) - 1);
+		
 		attractionMarker.setIcon( L.icon({
 				iconUrl: "./data/" + attractionInfo["type"] + "s_pictures/resize/" + attractionInfo["id"] + ".jpg",
 				iconSize: [Math.round(80 * scaleFactor), Math.round(60 * scaleFactor)],
 				iconAnchor: [0, 0],
 				popupAnchor: [-3, 76]
-		}))
+		}));
+
+
 		associatedMap.attractionMarkerMap.get(d).addTo(associatedMap.map);
+		
+		/* add the star and the title to map */
+
 	});
 }
 
@@ -303,8 +309,11 @@ function updateZoomDemo(e) {
 		let mapBound = associatedMap.map.getBounds();
 		let mapCenter = associatedMap.map.latLngToLayerPoint(associatedMap.mapInitialCenter);
 		mapTitleImage.style("width", "460px").style("height", "430px")
-			.attr("transform", "rotate(-8,100,100)translate(" + (mapCenter.x - 450) + "," + (mapCenter.y - 320) + ")");
+			.attr("x", (mapCenter.x - 450) + "px")
+			.attr("y", (mapCenter.y - 320) + "px")
+			.attr("transform", "rotate(-8,100,100)");
 		mapTitleText.attr("transform", "translate(" + (mapCenter.x - 50) + "," + (mapCenter.y + 300) + ")").style("font-size", "220px");
+
 		/* 
 		if (this.getZoom() == this.getMinZoom()) {
 			mapTitleImage.style("width", "460px").style("height", "430px")
