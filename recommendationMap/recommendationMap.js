@@ -5,6 +5,8 @@ function recommendationMap(divId, maxZoom) {
 	this.attractionSelectedSet = d3.set()
 	/* add present selection for local info demo */
 	this.currentSelection = null;
+	/* radius for show range */
+	this.showRadius = 5;
 	
 	/* declare meta map attribute */
 	var minZoom = 10;
@@ -248,7 +250,9 @@ recommendationMap.prototype.showAttractionMarker = function(whetherInitial) {
 						associatedMap.attractionSelectedSet.add(this.attractionId);
 						checkedMarker.addTo(associatedMap.map);
 					}
+					associatedMap.showAttractionRange();
 					associatedMap.showRestaurantMarker(true);
+					associatedMap.showHostMarker(true);
 				})
 
 				attractionMarkerGroup[2].associatedMap = associatedMap;
@@ -328,43 +332,45 @@ recommendationMap.prototype.showAttractionMarker = function(whetherInitial) {
 	});
 }
 
+recommendationMap.prototype.showAttractionRange = function() {
+	let associatedMap = this;
+	/* 	this.attractionSelectedSet changed, use 5km for testing */
+	if(this.selectionRangeLayer != undefined) {
+		this.map.removeLayer(this.selectionRangeLayer);
+	}
+
+	/* change to take input later */
+	if (this.attractionShowSet.size() >= 1){
+		let featureCollection = [];
+		let options = {steps: 12, units: 'kilometers'};
+		this.attractionSelectedSet.each(function(d) {
+			let attractionInfoData = attractionInfoMap.get(d);
+			let center = [attractionInfoData["longitude"], attractionInfoData["latitude"]];
+			featureCollection.push(turf.circle(center, associatedMap.showRadius, options));
+		})
+		let unionFeature = featureCollection[0];
+		if (featureCollection.length > 1) {
+			for (var i = 0; i < featureCollection.length - 1; i++) {
+				unionFeature = turf.union(unionFeature, featureCollection[i+1]);
+			}
+		}
+
+		/* show on map */
+		this.selectionRangeLayer = L.geoJSON([unionFeature], {
+			style: this.rangeStyle,
+			pane: "geoLayer"
+		})
+		this.selectionRangeLayer.addTo(this.map);
+	}
+}
+
 recommendationMap.prototype.showRestaurantMarker = function(whetherUpdate) {
 	/* 
 	When new attraction is selected, read selection;
 	For all attraction selection, update them
 	*/
-	let associatedMap = this;
 	if (whetherUpdate) {
-		/* 	this.attractionSelectedSet changed, use 5km for testing */
-		if(this.selectionRangeLayer != undefined) {
-			this.map.removeLayer(this.selectionRangeLayer);
-		}
-
-		/* change to take input later */
-		if (this.attractionShowSet.size() >= 1){
-			let featureCollection = [];
-			let radius = 5;
-			let options = {steps: 12, units: 'kilometers'};
-			this.attractionSelectedSet.each(function(d) {
-				let attractionInfoData = attractionInfoMap.get(d);
-				let center = [attractionInfoData["longitude"], attractionInfoData["latitude"]];
-				console.log(center);
-				featureCollection.push(turf.circle(center, radius, options));
-			})
-			let unionFeature = featureCollection[0];
-			if (featureCollection.length > 1) {
-				for (var i = 0; i < featureCollection.length - 1; i++) {
-					unionFeature = turf.union(unionFeature, featureCollection[i+1]);
-				}
-			}
-
-			/* show on map */
-			this.selectionRangeLayer = L.geoJSON([unionFeature], {
-				style: this.rangeStyle,
-				pane: "geoLayer"
-			})
-			this.selectionRangeLayer.addTo(this.map);
-		}
+		
 	} else {
 		/* just dealing with zoom */
 	}
@@ -467,6 +473,7 @@ function updateZoomDemo(e) {
 		associatedMap.showAttractionMarker(false);
 		associatedMap.showRestaurantMarker(true);
 		associatedMap.showHostMarker(true);
+		associatedMap.showAttractionRange();
 	} else {
 		associatedMap.map.setMaxBounds(associatedMap.mapMaxBoundsZoom);
 		/* remove welcome text */
