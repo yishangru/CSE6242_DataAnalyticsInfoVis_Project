@@ -33,9 +33,9 @@ function recommendationMap(divId, maxZoom) {
 	this.map.getPane('markerLayer').style.zIndex = 500;
 
 	// add pane to map for country name tooltip
-	this.map.createPane('TooltipLayer');
+	this.map.createPane('geoLayer');
 	// set the stack position of added pane layer
-	this.map.getPane('TooltipLayer').style.zIndex = 575;
+	this.map.getPane('geoLayer').style.zIndex = 300;
 
 	// add tile layer for map
 	this.tileLayer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -179,7 +179,16 @@ function recommendationMap(divId, maxZoom) {
 }
 
 /* for map style */
-
+recommendationMap.prototype.rangeStyle = function(f) {
+    return {
+        weight: 4,
+        opacity: 0.7,
+        color: '#fc8d62',
+        dashArray: '2',
+        fillOpacity: 0.6,
+        fillColor: '#8dd3c7'
+    }
+}
 
 /* end map style */
 
@@ -212,10 +221,10 @@ recommendationMap.prototype.showAttractionMarker = function(whetherInitial) {
 			if(!associatedMap.attractionMarkerMap.has(d)){
 				/* create marker group */
 				let attractionMarkerGroup = [
-					L.marker([attractionInfo.latitude, attractionInfo.longtitude]), // image or icon
-					L.marker([attractionInfo.latitude, attractionInfo.longtitude]), // rating icon
-					L.marker([attractionInfo.latitude, attractionInfo.longtitude]), // add preference list
-					L.marker([attractionInfo.latitude, attractionInfo.longtitude]), // checked marked
+					L.marker([attractionInfo.latitude, attractionInfo.longitude]), // image or icon
+					L.marker([attractionInfo.latitude, attractionInfo.longitude]), // rating icon
+					L.marker([attractionInfo.latitude, attractionInfo.longitude]), // add preference list
+					L.marker([attractionInfo.latitude, attractionInfo.longitude]), // checked marked
 				];
 
 				associatedMap.attractionMarkerMap.set(d, attractionMarkerGroup);
@@ -231,7 +240,6 @@ recommendationMap.prototype.showAttractionMarker = function(whetherInitial) {
 				});
 				attractionMarkerGroup[0].on("click", function(e){
 					let associatedMap = this.associatedMap
-					console.log(this.attractionId);
 					let checkedMarker = associatedMap.attractionMarkerMap.get(this.attractionId)[3];
 					if (associatedMap.attractionSelectedSet.has(this.attractionId)){
 						associatedMap.attractionSelectedSet.remove(this.attractionId);
@@ -240,6 +248,13 @@ recommendationMap.prototype.showAttractionMarker = function(whetherInitial) {
 						associatedMap.attractionSelectedSet.add(this.attractionId);
 						checkedMarker.addTo(associatedMap.map);
 					}
+					associatedMap.showRestaurantMarker(true);
+				})
+
+				attractionMarkerGroup[2].associatedMap = associatedMap;
+				attractionMarkerGroup[2].attractionId = d;
+				attractionMarkerGroup[2].on("click", function(e){
+					/* add to preference list */
 				})
 			}
 			associatedMap.attractionAddedSet.add(d);
@@ -252,17 +267,22 @@ recommendationMap.prototype.showAttractionMarker = function(whetherInitial) {
 		let scaleFactor = 1 + 6 * (associatedMap.map.getZoom()/(associatedMap.map.getMinZoom() + 2) - 1);
 		
 		/* 0 as image */
+		let widthIcon = 80;
+		let heightIcon = 60;
 		attractionMarkerGroup[0].setIcon( L.icon({
 			iconUrl: "./data/" + attractionInfo["type"] + "s_pictures/resize/" + attractionInfo["id"] + ".jpg",
-			iconSize: [Math.round(80 * scaleFactor), Math.round(60 * scaleFactor)],
-			iconAnchor: [0, 0],
+			iconSize: [Math.round(widthIcon * scaleFactor), Math.round(heightIcon * scaleFactor)],
+			iconAnchor: [Math.round(widthIcon/2 * scaleFactor), Math.round(heightIcon/2 * scaleFactor)],
 			popupAnchor: [-3, 76],
 			className: "mapIcon"
 		}));
 		/* bind tooltip to the marker */
-		attractionMarkerGroup[0].bindTooltip("test", {
+		let tooltipContent = '<h4>' + attractionInfo["name"] + '</h4>\
+			Introduction:<br/>' + attractionInfo["introduction"] + '<br/>\
+			Website:&nbsp;<p>' + attractionInfo["website"] + '</p>';
+		attractionMarkerGroup[0].bindTooltip(tooltipContent, {
 			className: "attractionToolTip",
-			offset: [Math.round(40 * scaleFactor), -1 * Math.round(4 * scaleFactor)],
+			offset: [0, -1 * Math.round((heightIcon/2 + 4) * scaleFactor)],
 			direction: "top"
 		})
 		attractionMarkerGroup[0].addTo(associatedMap.map);
@@ -280,7 +300,7 @@ recommendationMap.prototype.showAttractionMarker = function(whetherInitial) {
 		attractionMarkerGroup[1].setIcon( L.icon({
 			iconUrl: "./recommendationMap/Icon/rates/" + attractionRating + half + ".png",
 			iconSize: [Math.round(13 * accumentStar * scaleFactor), Math.round(15 * scaleFactor)],
-			iconAnchor: [-1 * Math.round((80 - 13 * accumentStar)/2 * scaleFactor), -1 * Math.round(60 * scaleFactor - 1)]
+			iconAnchor: [Math.round((widthIcon/2 - (widthIcon - 13 * accumentStar)/2) * scaleFactor), -1 * Math.round(heightIcon/2 * scaleFactor)]
 		}));
 		attractionMarkerGroup[1].addTo(associatedMap.map);
 
@@ -288,7 +308,7 @@ recommendationMap.prototype.showAttractionMarker = function(whetherInitial) {
 		attractionMarkerGroup[2].setIcon( L.icon({
 			iconUrl: "./recommendationMap/Icon/plus.png",
 			iconSize: [Math.round(30 * scaleFactor), Math.round(30 * scaleFactor)],
-			iconAnchor: [-1 * Math.round(80 * scaleFactor), 0],
+			iconAnchor: [-1 * Math.round(widthIcon/2 * scaleFactor), Math.round(heightIcon/2 * scaleFactor)],
 			popupAnchor: [-3, 76]
 		}));
 		attractionMarkerGroup[2].addTo(associatedMap.map);
@@ -297,7 +317,7 @@ recommendationMap.prototype.showAttractionMarker = function(whetherInitial) {
 		attractionMarkerGroup[3].setIcon( L.icon({
 			iconUrl: "./recommendationMap/Icon/selected.png",
 			iconSize: [Math.round(30 * scaleFactor), Math.round(30 * scaleFactor)],
-			iconAnchor: [-1 * Math.round((80 - 30)/2 * scaleFactor), -1 * Math.round(30 * scaleFactor)],
+			iconAnchor: [ Math.round(30/2 * scaleFactor), -1 * Math.round((30 - heightIcon/2) * scaleFactor)],
 			popupAnchor: [-3, 76]
 		}));
 		if (associatedMap.attractionSelectedSet.has(d)){
@@ -308,8 +328,46 @@ recommendationMap.prototype.showAttractionMarker = function(whetherInitial) {
 	});
 }
 
-recommendationMap.prototype.showRestaurantMarker = function() {
+recommendationMap.prototype.showRestaurantMarker = function(whetherUpdate) {
+	/* 
+	When new attraction is selected, read selection;
+	For all attraction selection, update them
+	*/
+	let associatedMap = this;
+	if (whetherUpdate) {
+		/* 	this.attractionSelectedSet changed, use 5km for testing */
+		if(this.selectionRangeLayer != undefined) {
+			this.map.removeLayer(this.selectionRangeLayer);
+		}
 
+		/* change to take input later */
+		if (this.attractionShowSet.size() >= 1){
+			let featureCollection = [];
+			let radius = 5;
+			let options = {steps: 12, units: 'kilometers'};
+			this.attractionSelectedSet.each(function(d) {
+				let attractionInfoData = attractionInfoMap.get(d);
+				let center = [attractionInfoData["longitude"], attractionInfoData["latitude"]];
+				console.log(center);
+				featureCollection.push(turf.circle(center, radius, options));
+			})
+			let unionFeature = featureCollection[0];
+			if (featureCollection.length > 1) {
+				for (var i = 0; i < featureCollection.length - 1; i++) {
+					unionFeature = turf.union(unionFeature, featureCollection[i+1]);
+				}
+			}
+
+			/* show on map */
+			this.selectionRangeLayer = L.geoJSON([unionFeature], {
+				style: this.rangeStyle,
+				pane: "geoLayer"
+			})
+			this.selectionRangeLayer.addTo(this.map);
+		}
+	} else {
+		/* just dealing with zoom */
+	}
 }
 
 recommendationMap.prototype.showHostMarker = function() {
@@ -402,22 +460,22 @@ function updateZoomDemo(e) {
 			mapTitleText.attr("transform", "translate(" + (mapCenter.x - 50) + "," + (mapCenter.y + 280) + ")").style("font-size", "200px");
 		}
 		*/
-
+		associatedMap.attractionSelectedSet.clear();
 		associatedMap.attractionShowSet.clear();
 		associatedMap.restaurantShowSet.clear();
 		associatedMap.hostShowSet.clear();
 		associatedMap.showAttractionMarker(false);
-		associatedMap.showRestaurantMarker(false);
-		associatedMap.showHostMarker(false);
+		associatedMap.showRestaurantMarker(true);
+		associatedMap.showHostMarker(true);
 	} else {
 		associatedMap.map.setMaxBounds(associatedMap.mapMaxBoundsZoom);
 		/* remove welcome text */
 		if (!mapTitleGroup.empty()) {
 			mapTitleGroup.remove();
 		}
-		associatedMap.showAttractionMarker(this.getZoom() <= this.getMinZoom() + 1? true : false);
-		associatedMap.showRestaurantMarker(this.getZoom() <= this.getMinZoom() + 1? true : false);
-		associatedMap.showHostMarker(this.getZoom() <= this.getMinZoom() + 1? true : false);
+		associatedMap.showAttractionMarker(this.getZoom() == this.getMinZoom() + 1? true : false);
+		associatedMap.showRestaurantMarker(false);
+		associatedMap.showHostMarker(false);
 	}
 }
 

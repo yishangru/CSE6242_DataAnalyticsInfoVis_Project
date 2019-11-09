@@ -1,4 +1,4 @@
-id,type,name,latitude,longtitude,rating,introduction,website
+id,type,name,latitude,longitude,rating,introduction,website
 1,casino,Caesars Palace,36.1166277,-115.1767568,4.6,Best casino for sports betting,https://en.wikipedia.org/wiki/Caesars_Palace
 2,casino,Aria Resort & Casino,36.1070349,-115.1779758,4.6,Best casino for slots,https://en.wikipedia.org/wiki/Aria_Resort_and_Casino
 3,casino,Bellagio,36.11311495,-115.1770065,4.7,Best casino for poker,https://en.wikipedia.org/wiki/Bellagio_(resort)
