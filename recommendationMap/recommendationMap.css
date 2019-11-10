@@ -318,10 +318,10 @@ label.btn.btn-secondary.active:active {
 .hostToolTip {
     overflow-wrap: break-word;
     max-width: 500px;
-    background: rgba(253,205,172, 0.8);
+    background: rgba(251,154,153, 0.8);
     padding: 0px 10px 0px 10px;
     border:3;
-    border-color: rgb(179,205,227);
+    border-color: rgb(117,112,179);
     border-radius:10px;
     box-shadow: 1 0px 0px;
     text-anchor: start;
@@ -342,5 +342,5 @@ label.btn.btn-secondary.active:active {
   word-wrap: break-word;
   font-size: 12px;
   word-break: break-all;
-  color: rgb(55,126,184);
+  color: rgb(127,201,127);
 }

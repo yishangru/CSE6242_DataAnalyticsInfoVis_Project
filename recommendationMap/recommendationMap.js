@@ -827,7 +827,9 @@ function updateZoomDemo(e) {
 		
 		/* update for restaurant and host */
 		associatedMap.updateRestaurantMarker(true);
+		associatedMap.showSelectedRestaurantRange();
 		associatedMap.updateHostMarker(true);
+		associatedMap.showSelectedHostsRange();
 	} else {
 		/* not back to original states */
 		associatedMap.map.setMaxBounds(associatedMap.mapMaxBoundsZoom);
@@ -839,8 +841,6 @@ function updateZoomDemo(e) {
 
 		/* selected set not change */
 		associatedMap.updateAttractionMarker();
-		associatedMap.showSelectedAttractionRange();
-
 		associatedMap.updateRestaurantMarker(false);
 		associatedMap.updateHostMarker(false);
 	}
