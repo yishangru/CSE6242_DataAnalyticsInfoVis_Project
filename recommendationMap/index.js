@@ -89,7 +89,7 @@ function restaurantProcess(d) {
 		longitude: +d.longitude,
 		address: d.address,
 		reviewCount: +d["review_count"],
-		categories: d["categories"].split(",")
+		categories: d["categories"]
 	}
 }
 
@@ -106,6 +106,6 @@ function hostProcess(d) {
 		type: d["property_type"],
 		minimunNights: +d["minimun_nights"],
 		reviewCount: +d["number_of_reviews"],
-		amenities: d["amenities"].replace("{", "").replace("}", "").split(",")
+		amenities: d["amenities"].replace("{", "").replace("}", "")
 	}
 }

@@ -390,7 +390,6 @@ recommendationMap.prototype.generateAroundInfo = function(attractionId) {
 		hostInfoMap.each(function(d) {
 			let to = turf.point([d["longitude"], d["latitude"]]);
 			if (turf.distance(from, to, options) <= associatedMap.attractionRadiusDef) {
-				console.log(turf.distance(from, to, options));
 				aroundHosts.add(d["host_id"]);
 			} 
 		})
@@ -464,15 +463,124 @@ recommendationMap.prototype.updateRestaurantMarker = function(whetherUpdate) {
 	When new attraction is selected, read selection;
 	For all attraction selection, update them
 	*/
+	let associatedMap = this;
 	if (whetherUpdate) {
+		associatedMap.restaurantShowSet.each(function(restaurantId) {
+			associatedMap.restaurantMarkerMap.get(restaurantId).forEach(function(d) {
+			associatedMap.map.removeLayer(d);
+		})});
+		associatedMap.restaurantShowSet.clear();
 
-	} else {
-		/* just dealing with zoom */
+		associatedMap.attractionSelectedSet.each(function(d) {
+			attractionAroundMap.get(d)["restaurants"].get(associatedMap.attractionRadius).each(function(d) {
+				associatedMap.restaurantShowSet.add(d);
+			});
+		});
+		associatedMap.restaurantSelectedSet.each(function(d) {
+			associatedMap.restaurantShowSet.add(d);
+		});
 	}
+	associatedMap.restaurantShowSet.each(function(d) {
+		associatedMap.updateRestaurantMarkerShow(d);
+	});
 }
 
 recommendationMap.prototype.updateRestaurantMarkerShow = function(restaurantId) {
+	let associatedMap = this;
+	let restaurantInfo = restaurantInfoMap.get(restaurantId);
+		
+	if(!associatedMap.restaurantMarkerMap.has(restaurantId)){
+		/* create marker group */
+		let restaurantMarkerGroup = [
+			L.marker([restaurantInfo.latitude, restaurantInfo.longitude]), // image or icon
+			L.marker([restaurantInfo.latitude, restaurantInfo.longitude]), // add preference list
+			L.marker([restaurantInfo.latitude, restaurantInfo.longitude]), // add for selected
+		];
 
+		associatedMap.restaurantMarkerMap.set(restaurantId, restaurantMarkerGroup);
+		
+		restaurantMarkerGroup[0].restaurantId = restaurantId;
+		restaurantMarkerGroup[0].associatedMap = associatedMap;
+
+		restaurantMarkerGroup[0].on("mouseover", function(e){
+			this.openPopup();
+		});
+		restaurantMarkerGroup[0].on("mouseout", function(e){
+			this.closePopup();
+		});
+		restaurantMarkerGroup[0].on("click", function(e){
+			let associatedMap = this.associatedMap
+			let checkedMarker = associatedMap.restaurantMarkerMap.get(this.restaurantId)[2];
+			
+			/* if already selected, change to unselected */
+			if (associatedMap.restaurantSelectedSet.has(this.restaurantId)){
+				associatedMap.restaurantSelectedSet.remove(this.restaurantId);
+				associatedMap.map.removeLayer(checkedMarker);
+			} else {
+				associatedMap.restaurantSelectedSet.add(this.restaurantId);
+				checkedMarker.addTo(associatedMap.map);
+			}
+			associatedMap.showSelectedRestaurantRange();
+		})
+
+		restaurantMarkerGroup[1].associatedMap = associatedMap;
+		restaurantMarkerGroup[1].restaurantId = restaurantId;
+		restaurantMarkerGroup[1].on("click", function(e){
+			/* add to preference list, not implement yet*/
+		})
+	}
+	/* remove already added marker for enlarge zoom event */
+	associatedMap.restaurantMarkerMap.get(restaurantId).forEach(function(d) {
+		associatedMap.map.removeLayer(d);
+	})
+
+	let widthIcon = 15;
+	let heightIcon = 15;
+	let restaurantMarkerGroup = associatedMap.restaurantMarkerMap.get(restaurantId);
+	let scaleFactor = 1 + 6 * (associatedMap.map.getZoom()/(associatedMap.map.getMinZoom() + 2) - 1);
+	
+	/* 0 as image */
+		let iconRestaurant = L.icon({
+			iconUrl: restaurantInfo["star"] >= 4.5? "./recommendationMap/Icon/restaurant1.png" : "./recommendationMap/Icon/restaurant2.png",
+			iconSize: [Math.round(widthIcon * scaleFactor), Math.round(heightIcon * scaleFactor)],
+			iconAnchor: [Math.round(widthIcon/2 * scaleFactor), Math.round(heightIcon/2 * scaleFactor)],
+			popupAnchor: [-3, 76],
+			className: "mapIcon"
+		})
+		restaurantMarkerGroup[0].setIcon(iconRestaurant);
+		/* bind tooltip to the marker */
+		let tooltipContent = '<h4>' + restaurantInfo["name"] + '</h4>\
+			Star:&nbsp;' + restaurantInfo["star"] + '/5<br/>\
+			Address:&nbsp;' + restaurantInfo["address"] + '<br/>\
+			Popularity (Review Count):&nbsp;' + restaurantInfo["reviewCount"] + '<br/>\
+			Categories:&nbsp;<p>' + restaurantInfo["categories"] + '</p>';
+		restaurantMarkerGroup[0].bindTooltip(tooltipContent, {
+			className: "restaurantToolTip",
+			offset: [0, -1 * Math.round((heightIcon/2 + 4) * scaleFactor)],
+			direction: "top"
+		})
+		restaurantMarkerGroup[0].addTo(associatedMap.map);
+
+
+	/* 1 as add preference list */
+		restaurantMarkerGroup[1].setIcon(L.icon({
+			iconUrl: "./recommendationMap/Icon/plus.png",
+			iconSize: [Math.round(10 * scaleFactor), Math.round(10 * scaleFactor)],
+			iconAnchor: [-1 * Math.round(widthIcon/2 * scaleFactor), Math.round(heightIcon/2 * scaleFactor)],
+			popupAnchor: [-3, 76]
+		}));
+		restaurantMarkerGroup[1].addTo(associatedMap.map);
+
+	/* 2 as checked symbol */
+		restaurantMarkerGroup[2].setIcon( L.icon({
+			iconUrl: "./recommendationMap/Icon/yelp-pointer.png",
+			iconSize: [Math.round(26 * scaleFactor), Math.round(30 * scaleFactor)],
+			iconAnchor: [ Math.round(26/2 * scaleFactor), Math.round(30* scaleFactor)],
+			popupAnchor: [-3, 76]
+		}));
+		if (associatedMap.restaurantSelectedSet.has(restaurantId)){
+			restaurantMarkerGroup[2].addTo(associatedMap.map);
+		}
 }
 
 /* show geo range for selected restaurant */
@@ -512,15 +620,126 @@ recommendationMap.prototype.updateHostMarker = function(whetherUpdate) {
 	When new attraction is selected, read selection;
 	For all attraction selection, update them
 	*/
+	let associatedMap = this;
 	if (whetherUpdate) {
-		
-	} else {
-		/* just dealing with zoom */
+		associatedMap.hostShowSet.each(function(hostId) {
+			associatedMap.hostMarkerMap.get(hostId).forEach(function(d) {
+			associatedMap.map.removeLayer(d);
+		})});
+		associatedMap.hostShowSet.clear();
+		associatedMap.attractionSelectedSet.each(function(d) {
+			attractionAroundMap.get(d)["hosts"].get(associatedMap.attractionRadius).each(function(d) {
+				associatedMap.hostShowSet.add(d);
+			});
+		});
+		associatedMap.hostSelectedSet.each(function(d) {
+			associatedMap.hostShowSet.add(d);
+		});
 	}
+	associatedMap.hostShowSet.each(function(d) {
+		associatedMap.updateHostMarkerShow(d);
+	});
 }
 
 recommendationMap.prototype.updateHostMarkerShow = function(hostId) {
+	let associatedMap = this;
+	let hostInfo = hostInfoMap.get(hostId);
+		
+	if(!associatedMap.hostMarkerMap.has(hostId)){
+		/* create marker group */
+		let hostMarkerGroup = [
+			L.marker([hostInfo.latitude, hostInfo.longitude]), // image or icon
+			L.marker([hostInfo.latitude, hostInfo.longitude]), // add preference list
+			L.marker([hostInfo.latitude, hostInfo.longitude]), // add for selected
+		];
+
+		associatedMap.hostMarkerMap.set(hostId, hostMarkerGroup);
+		
+		hostMarkerGroup[0].hostId = hostId;
+		hostMarkerGroup[0].associatedMap = associatedMap;
+
+		hostMarkerGroup[0].on("mouseover", function(e){
+			this.openPopup();
+		});
+		hostMarkerGroup[0].on("mouseout", function(e){
+			this.closePopup();
+		});
+		hostMarkerGroup[0].on("click", function(e){
+			let associatedMap = this.associatedMap
+			let checkedMarker = associatedMap.hostMarkerMap.get(this.hostId)[2];
+			
+			/* if already selected, change to unselected */
+			if (associatedMap.hostSelectedSet.has(this.hostId)){
+				associatedMap.hostSelectedSet.remove(this.hostId);
+				associatedMap.map.removeLayer(checkedMarker);
+			} else {
+				associatedMap.hostSelectedSet.add(this.hostId);
+				checkedMarker.addTo(associatedMap.map);
+			}
+			associatedMap.showSelectedHostsRange();
+		})
+
+		hostMarkerGroup[1].associatedMap = associatedMap;
+		hostMarkerGroup[1].hostId = hostId;
+		hostMarkerGroup[1].on("click", function(e){
+			/* add to preference list, not implement yet*/
+		})
+	}
+	/* remove already added marker for enlarge zoom event */
+	associatedMap.hostMarkerMap.get(hostId).forEach(function(d) {
+		associatedMap.map.removeLayer(d);
+	})
+
+	let widthIcon = 15;
+	let heightIcon = 15;
+	let hostMarkerGroup = associatedMap.hostMarkerMap.get(hostId);
+	let scaleFactor = 1 + 6 * (associatedMap.map.getZoom()/(associatedMap.map.getMinZoom() + 2) - 1);
 	
+	/* 0 as image */
+		let iconhost = L.icon({
+			iconUrl: hostInfo["rating"] >= 98? "./recommendationMap/Icon/host3.png" : "./recommendationMap/Icon/host2.png",
+			iconSize: [Math.round(widthIcon * scaleFactor), Math.round(heightIcon * scaleFactor)],
+			iconAnchor: [Math.round(widthIcon/2 * scaleFactor), Math.round(heightIcon/2 * scaleFactor)],
+			popupAnchor: [-3, 76],
+			className: "mapIcon"
+		})
+		hostMarkerGroup[0].setIcon(iconhost);
+		/* bind tooltip to the marker */
+		let tooltipContent = '<h4>' + hostInfo["name"] + '</h4>\
+			Rating:&nbsp;' + hostInfo["rating"] + '/100<br/>\
+			Price:&nbsp;' + hostInfo["price"] + '<br/>\
+			Type:&nbsp;' + hostInfo["type"] + '<br/>\
+			Popularity (Review Count):&nbsp;' + hostInfo["reviewCount"] + '<br/>\
+			Description:&nbsp;<br/><p>They say the fishing is excellent at Lake Chargoggagoggmanchauggagoggchaubunagungamaugg, though I ve never been there myself.</p><br/>\
+			Amenities:&nbsp;<br/><p>They say the fishing is excellent at Lake Chargoggagoggmanchauggagoggchaubunagungamaugg, though I ve never been there myself.</p>';
+		
+		hostMarkerGroup[0].bindTooltip(tooltipContent, {
+			className: "hostToolTip",
+			offset: [0, -1 * Math.round((heightIcon/2 + 4) * scaleFactor)],
+			direction: "top"
+		})
+		hostMarkerGroup[0].addTo(associatedMap.map);
+
+
+	/* 1 as add preference list */
+		hostMarkerGroup[1].setIcon(L.icon({
+			iconUrl: "./recommendationMap/Icon/plus.png",
+			iconSize: [Math.round(10 * scaleFactor), Math.round(10 * scaleFactor)],
+			iconAnchor: [-1 * Math.round(widthIcon/2 * scaleFactor), Math.round(heightIcon/2 * scaleFactor)],
+			popupAnchor: [-3, 76]
+		}));
+		hostMarkerGroup[1].addTo(associatedMap.map);
+
+	/* 2 as checked symbol */
+		hostMarkerGroup[2].setIcon( L.icon({
+			iconUrl: "./recommendationMap/Icon/host-pointer.png",
+			iconSize: [Math.round(26 * scaleFactor), Math.round(30 * scaleFactor)],
+			iconAnchor: [ Math.round(26/2 * scaleFactor), Math.round(30* scaleFactor)],
+			popupAnchor: [-3, 76]
+		}));
+		if (associatedMap.hostSelectedSet.has(hostId)){
+			hostMarkerGroup[2].addTo(associatedMap.map);
+		}
 }
 
 /* show geo range for selected host */
@@ -535,7 +754,7 @@ recommendationMap.prototype.showSelectedHostsRange = function() {
 	if (this.hostSelectedSet.size() >= 1){
 		let featureCollection = [];
 		let options = {steps: 12, units: 'kilometers'};
-		this.restaurantSelectedSet.each(function(d) {
+		this.hostSelectedSet.each(function(d) {
 			let hostInfoData = hostInfoMap.get(d);
 			let center = [hostInfoData["longitude"], hostInfoData["latitude"]];
 			featureCollection.push(turf.circle(center, associatedMap.hostRadius, options));
@@ -602,10 +821,8 @@ function updateZoomDemo(e) {
 		associatedMap.attractionSelectedSet.clear();
 		
 		associatedMap.restaurantSelectedSet.clear();
-		associatedMap.restaurantShowSet.clear();
 		
 		associatedMap.hostSelectedSet.clear();
-		associatedMap.hostShowSet.clear();
 
 		/* update for marker */
 		associatedMap.updateAttractionMarker();
@@ -625,6 +842,8 @@ function updateZoomDemo(e) {
 
 		/* selected set not change */
 		associatedMap.updateAttractionMarker();
+		associatedMap.showSelectedAttractionRange();
+
 		associatedMap.updateRestaurantMarker(false);
 		associatedMap.updateHostMarker(false);
 	}
@@ -653,6 +872,25 @@ function expandInfoSection(e){
 			.enter().append("button").attr("class", "restaurantInfo").style("width", "280px").style("height", "27px").text(d=>d.name + "--" + d.star + "/5")
 			.on("click", function(e) {
 				/* add as selection, set map view, zoom */
+				let restaurantInfoData = d3.select(this).datum();
+				if (!recommendationMap.restaurantSelectedSet.has(restaurantInfoData["restaurant_id"])){
+					d3.select(this).style("background", "rgba(255,255,255, 1)");
+					recommendationMap.restaurantSelectedSet.add(restaurantInfoData["restaurant_id"]);
+					recommendationMap.restaurantShowSet.add(restaurantInfoData["restaurant_id"]);
+					recommendationMap.updateRestaurantMarkerShow(restaurantInfoData["restaurant_id"]);
+					recommendationMap.showSelectedRestaurantRange();
+					recommendationMap.map.setZoom(12);
+					recommendationMap.map.setView(new L.LatLng(restaurantInfoData["latitude"], restaurantInfoData["longitude"]));
+				} else {
+					d3.select(this).style("background", "rgba(255,255,255, 0.1)");
+					recommendationMap.restaurantSelectedSet.remove(restaurantInfoData["restaurant_id"]);
+					recommendationMap.restaurantShowSet.remove(restaurantInfoData["restaurant_id"]);
+					recommendationMap.restaurantMarkerMap.get(restaurantInfoData["restaurant_id"]).forEach(function(d) {
+						recommendationMap.map.removeLayer(d);
+					});
+					recommendationMap.showSelectedRestaurantRange();
+					recommendationMap.map.setView(recommendationMap.mapInitialCenter);
+				}
 
 			});
 		appenddiv.append("p").text("To Be Continued ......");
@@ -670,6 +908,25 @@ function expandInfoSection(e){
 			})
 			.on("click", function(e) {
 				/* add as selection, set map view, zoom */
+				let hostInfoData = d3.select(this).datum();
+				if (!recommendationMap.hostSelectedSet.has(hostInfoData["host_id"])){
+					d3.select(this).style("background", "rgba(255,255,255, 1)");
+					recommendationMap.hostSelectedSet.add(hostInfoData["host_id"]);
+					recommendationMap.hostShowSet.add(hostInfoData["host_id"]);
+					recommendationMap.updateHostMarkerShow(hostInfoData["host_id"]);
+					recommendationMap.showSelectedHostsRange();
+					recommendationMap.map.setZoom(12);
+					recommendationMap.map.setView(new L.LatLng(hostInfoData["latitude"], hostInfoData["longitude"]));
+				} else {
+					d3.select(this).style("background", "rgba(255,255,255, 0.1)");
+					recommendationMap.hostSelectedSet.remove(hostInfoData["host_id"]);
+					recommendationMap.hostShowSet.remove(hostInfoData["host_id"]);
+					recommendationMap.hostMarkerMap.get(hostInfoData["host_id"]).forEach(function(d) {
+						recommendationMap.map.removeLayer(d);
+					});
+					recommendationMap.showSelectedHostsRange();
+					recommendationMap.map.setView(recommendationMap.mapInitialCenter);
+				}
 
 			});
 		appenddiv.append("p").text("To Be Continued ......");
@@ -688,14 +945,21 @@ function expandInfoSection(e){
 					recommendationMap.attractionSelectedSet.add(attractionInfoData["attraction_id"]);
 					recommendationMap.updateAttractionMarkerShow(attractionInfoData["attraction_id"]);
 					recommendationMap.showSelectedAttractionRange();
+					recommendationMap.updateRestaurantMarker(true);
+					recommendationMap.updateHostMarker(true);
+					
 					recommendationMap.map.setZoom(12);
 					recommendationMap.map.setView(new L.LatLng(attractionInfoData["latitude"], attractionInfoData["longitude"]));
+					/* show around info */
+
 				} else {
 					d3.select(this).style("background", "rgba(255,255,255, 0.1)")
 					recommendationMap.attractionSelectedSet.remove(attractionInfoData["attraction_id"]);
-					recommendationMap.updateAttractionMarkerShow(attractionInfoData["attraction_id"]);
 					recommendationMap.showSelectedAttractionRange();
+					recommendationMap.updateRestaurantMarker(true);
+					recommendationMap.updateHostMarker(true);
 					recommendationMap.map.setView(recommendationMap.mapInitialCenter);
+					/* show around info */
 				}
 			});
 		appenddiv.append("p").text("To Be Continued ......");

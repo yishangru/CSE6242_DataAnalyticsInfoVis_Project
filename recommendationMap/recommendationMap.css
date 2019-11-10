@@ -287,3 +287,60 @@ label.btn.btn-secondary.active:active {
   font-size: 12px;
   color: rgb(255,127,0);
 }
+
+.restaurantToolTip {
+    background: rgba(253,205,172, 0.8);
+    padding: 0px 10px 0px 10px;
+    border:3;
+    border-color: rgb(179,205,227);
+    border-radius:10px;
+    box-shadow: 1 0px 0px;
+    text-anchor: start;
+    font-weight: 200;
+    min-width: 135px;
+    font-family: pirates;
+    font-size: 15px;
+    width: 200px;
+    display: block;
+}
+
+.restaurantToolTip h4{
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.restaurantToolTip p{
+  font-size: 12px;
+  color: rgb(55,126,184);
+}
+
+
+.hostToolTip {
+    overflow-wrap: break-word;
+    max-width: 500px;
+    background: rgba(253,205,172, 0.8);
+    padding: 0px 10px 0px 10px;
+    border:3;
+    border-color: rgb(179,205,227);
+    border-radius:10px;
+    box-shadow: 1 0px 0px;
+    text-anchor: start;
+    font-weight: 200;
+    min-width: 135px;
+    font-family: pirates;
+    font-size: 15px;
+    display: block;
+}
+
+.hostToolTip h4{
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.hostToolTip p{
+  display: inline;
+  word-wrap: break-word;
+  font-size: 12px;
+  word-break: break-all;
+  color: rgb(55,126,184);
+}
