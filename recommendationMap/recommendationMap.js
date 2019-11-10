@@ -9,9 +9,6 @@ function recommendationMap(divId, maxZoom) {
 	/* add set to record the selected hosts */
 	this.hostSelectedSet = d3.set();
 	
-	/* add present selection for local info demo */
-	this.currentSelection = null;
-	
 	/* radius for show range */
 	this.attractionRadiusDef = 5;
 	this.restaurantRadiusDef = 3;
