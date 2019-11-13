@@ -773,6 +773,7 @@ recommendationMap.prototype.showSelectedHostsRange = function() {
 
 /* for map interaction */
 function updateZoomDemo(e) {
+
 	let associatedMap = this.associatedMap;
 	let geoSvg = d3.select("#" + associatedMap.divId).select("#" + associatedMap.divId + "geoSvg");
 
@@ -867,12 +868,12 @@ function expandInfoSection(e){
 				/* add as selection, set map view, zoom */
 				let restaurantInfoData = d3.select(this).datum();
 				if (!recommendationMap.restaurantSelectedSet.has(restaurantInfoData["restaurant_id"])){
+					recommendationMap.map.setZoom(12);
 					d3.select(this).style("background", "rgba(255,255,255, 1)");
 					recommendationMap.restaurantSelectedSet.add(restaurantInfoData["restaurant_id"]);
 					recommendationMap.restaurantShowSet.add(restaurantInfoData["restaurant_id"]);
 					recommendationMap.updateRestaurantMarkerShow(restaurantInfoData["restaurant_id"]);
 					recommendationMap.showSelectedRestaurantRange();
-					recommendationMap.map.setZoom(12);
 					recommendationMap.map.setView(new L.LatLng(restaurantInfoData["latitude"], restaurantInfoData["longitude"]));
 				} else {
 					d3.select(this).style("background", "rgba(255,255,255, 0.1)");
@@ -903,12 +904,12 @@ function expandInfoSection(e){
 				/* add as selection, set map view, zoom */
 				let hostInfoData = d3.select(this).datum();
 				if (!recommendationMap.hostSelectedSet.has(hostInfoData["host_id"])){
+					recommendationMap.map.setZoom(12);
 					d3.select(this).style("background", "rgba(255,255,255, 1)");
 					recommendationMap.hostSelectedSet.add(hostInfoData["host_id"]);
 					recommendationMap.hostShowSet.add(hostInfoData["host_id"]);
 					recommendationMap.updateHostMarkerShow(hostInfoData["host_id"]);
 					recommendationMap.showSelectedHostsRange();
-					recommendationMap.map.setZoom(12);
 					recommendationMap.map.setView(new L.LatLng(hostInfoData["latitude"], hostInfoData["longitude"]));
 				} else {
 					d3.select(this).style("background", "rgba(255,255,255, 0.1)");
@@ -933,6 +934,7 @@ function expandInfoSection(e){
 				/* add as selection, set map view, zoom */
 				let attractionInfoData = d3.select(this).datum();
 				if (!recommendationMap.attractionSelectedSet.has(attractionInfoData["attraction_id"])){
+					recommendationMap.map.setZoom(12);
 					recommendationMap.generateAroundInfo(attractionInfoData["attraction_id"]);
 					d3.select(this).style("background", "rgba(255,255,255, 1)")
 					recommendationMap.attractionSelectedSet.add(attractionInfoData["attraction_id"]);
@@ -940,14 +942,13 @@ function expandInfoSection(e){
 					recommendationMap.showSelectedAttractionRange();
 					recommendationMap.updateRestaurantMarker(true);
 					recommendationMap.updateHostMarker(true);
-					
-					recommendationMap.map.setZoom(12);
 					recommendationMap.map.setView(new L.LatLng(attractionInfoData["latitude"], attractionInfoData["longitude"]));
 					/* show around info */
 
 				} else {
 					d3.select(this).style("background", "rgba(255,255,255, 0.1)")
 					recommendationMap.attractionSelectedSet.remove(attractionInfoData["attraction_id"]);
+					recommendationMap.updateAttractionMarkerShow(attractionInfoData["attraction_id"]);
 					recommendationMap.showSelectedAttractionRange();
 					recommendationMap.updateRestaurantMarker(true);
 					recommendationMap.updateHostMarker(true);
