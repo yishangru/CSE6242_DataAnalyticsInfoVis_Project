@@ -812,6 +812,8 @@ function updateZoomDemo(e) {
 		associatedMap.updateHostMarker(true);
 		associatedMap.showSelectedHostsRange();
 
+		let mapCenter = associatedMap.map.latLngToLayerPoint(associatedMap.mapInitialCenter);
+		
 		if (mapTitleGroup.empty()){
 			mapTitleGroup = geoSvg.append("g").attr("id", associatedMap.divId + "mapTitleGroup");
 			mapTitleGroup.append("image").attr("id", associatedMap.divId + "mapTitleImage")
@@ -823,16 +825,16 @@ function updateZoomDemo(e) {
 		let mapTitleText = mapTitleGroup.select("#" + associatedMap.divId + "mapTitleText");
 		let mapTitleImage = mapTitleGroup.select("#" + associatedMap.divId + "mapTitleImage");
 
-		let mapCenter = associatedMap.map.latLngToLayerPoint(associatedMap.mapInitialCenter);
 		mapTitleImage.style("width", "460px").style("height", "430px")
 			.transition()
 			.attr("transform", "translate(" + (mapCenter.x - 450) + "," + (mapCenter.y - 350) + ")rotate(-12,100,100)")
 			.duration(300);
-		mapTitleText.transition()
-			.attr("transform", "translate(" + (mapCenter.x - 50) + "," + (mapCenter.y + 300) + ")")
-			.style("font-size", "220px")
-			duration(300);
-		
+		mapTitleText.style("font-size", "220px")
+			.attr("transform", "translate(" + (2 * mapCenter.x) + "," + (2 * mapCenter.y) + ")")
+			.transition()
+			.attr("transform", "translate(" + (mapCenter.x - 30) + "," + (mapCenter.y + 300) + ")")
+			.duration(300);
+
 	} else {
 		/* not back to original states */
 		associatedMap.map.setMaxBounds(associatedMap.mapMaxBoundsZoom);
