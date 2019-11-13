@@ -827,12 +827,12 @@ function updateZoomDemo(e) {
 
 		mapTitleImage.style("width", "460px").style("height", "430px")
 			.transition()
-			.attr("transform", "translate(" + (mapCenter.x - 450) + "," + (mapCenter.y - 350) + ")rotate(-12,100,100)")
+			.attr("transform", "translate(" + (mapCenter.x - 450) + "," + (mapCenter.y - 370) + ")rotate(-12,100,100)")
 			.duration(300);
 		mapTitleText.style("font-size", "220px")
 			.attr("transform", "translate(" + (2 * mapCenter.x) + "," + (2 * mapCenter.y) + ")")
 			.transition()
-			.attr("transform", "translate(" + (mapCenter.x - 30) + "," + (mapCenter.y + 300) + ")")
+			.attr("transform", "translate(" + (mapCenter.x - 30) + "," + (mapCenter.y + 280) + ")")
 			.duration(300);
 
 	} else {
