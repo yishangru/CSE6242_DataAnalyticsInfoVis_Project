@@ -26,7 +26,6 @@ function recommendationMap(divId, maxZoom) {
 
 	d3.select("#" + this.divId).style("width", (window.screen.availWidth - 4) + "px").style("height", (window.screen.availHeight - 75) + "px");
 	this.map = L.map(divId, {
-		maxBounds: this.mapMaxBounds,
 		minZoom: minZoom
 	}).setView(this.mapInitialCenter, minZoom);
 	this.map.associatedMap = this;
@@ -782,6 +781,8 @@ function updateZoomDemo(e) {
 	if (this.getZoom()  < this.getMinZoom() + 1){
 		/* display welcome text */
 		associatedMap.map.setMaxBounds(associatedMap.mapMaxBounds);
+		associatedMap.map.flyToBounds(associatedMap.mapMaxBounds);
+
 		associatedMap.map.setView(associatedMap.mapInitialCenter);
 		if (mapTitleGroup.empty()){
 			mapTitleGroup = geoSvg.append("g").attr("id", associatedMap.divId + "mapTitleGroup");
@@ -794,12 +795,9 @@ function updateZoomDemo(e) {
 		let mapTitleText = mapTitleGroup.select("#" + associatedMap.divId + "mapTitleText");
 		let mapTitleImage = mapTitleGroup.select("#" + associatedMap.divId + "mapTitleImage");
 
-		let mapBound = associatedMap.map.getBounds();
 		let mapCenter = associatedMap.map.latLngToLayerPoint(associatedMap.mapInitialCenter);
 		mapTitleImage.style("width", "460px").style("height", "430px")
-			.attr("x", (mapCenter.x - 450) + "px")
-			.attr("y", (mapCenter.y - 320) + "px")
-			.attr("transform", "rotate(-8,100,100)");
+			.attr("transform", "translate(" + (mapCenter.x - 450) + "," + (mapCenter.y - 350) + ")rotate(-12,100,100)");
 		mapTitleText.attr("transform", "translate(" + (mapCenter.x - 50) + "," + (mapCenter.y + 300) + ")").style("font-size", "220px");
 
 		/* 
@@ -816,9 +814,7 @@ function updateZoomDemo(e) {
 
 		/* clear all selectedSet, back to original view */
 		associatedMap.attractionSelectedSet.clear();
-		
 		associatedMap.restaurantSelectedSet.clear();
-		
 		associatedMap.hostSelectedSet.clear();
 
 		/* update for marker */
