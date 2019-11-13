@@ -785,22 +785,6 @@ function updateZoomDemo(e) {
 		associatedMap.map.flyToBounds(associatedMap.mapMaxBounds);
 
 		associatedMap.map.setView(associatedMap.mapInitialCenter);
-		if (mapTitleGroup.empty()){
-			mapTitleGroup = geoSvg.append("g").attr("id", associatedMap.divId + "mapTitleGroup");
-			mapTitleGroup.append("image").attr("id", associatedMap.divId + "mapTitleImage")
-				.attr("href", "/recommendationMap/lasVegasTrans.png");
-			mapTitleGroup.append("text").attr("id", associatedMap.divId + "mapTitleText")
-				.text("Explore Local Greatness");
-		};
-
-		let mapTitleText = mapTitleGroup.select("#" + associatedMap.divId + "mapTitleText");
-		let mapTitleImage = mapTitleGroup.select("#" + associatedMap.divId + "mapTitleImage");
-
-		let mapCenter = associatedMap.map.latLngToLayerPoint(associatedMap.mapInitialCenter);
-		mapTitleImage.style("width", "460px").style("height", "430px")
-			.attr("transform", "translate(" + (mapCenter.x - 450) + "," + (mapCenter.y - 350) + ")rotate(-12,100,100)");
-		mapTitleText.attr("transform", "translate(" + (mapCenter.x - 50) + "," + (mapCenter.y + 300) + ")").style("font-size", "220px");
-
 		/* 
 		if (this.getZoom() == this.getMinZoom()) {
 			mapTitleImage.style("width", "460px").style("height", "430px")
@@ -827,6 +811,28 @@ function updateZoomDemo(e) {
 		associatedMap.showSelectedRestaurantRange();
 		associatedMap.updateHostMarker(true);
 		associatedMap.showSelectedHostsRange();
+
+		if (mapTitleGroup.empty()){
+			mapTitleGroup = geoSvg.append("g").attr("id", associatedMap.divId + "mapTitleGroup");
+			mapTitleGroup.append("image").attr("id", associatedMap.divId + "mapTitleImage")
+				.attr("href", "/recommendationMap/lasVegasTrans.png");
+			mapTitleGroup.append("text").attr("id", associatedMap.divId + "mapTitleText")
+				.text("Explore Local Greatness");
+		};
+
+		let mapTitleText = mapTitleGroup.select("#" + associatedMap.divId + "mapTitleText");
+		let mapTitleImage = mapTitleGroup.select("#" + associatedMap.divId + "mapTitleImage");
+
+		let mapCenter = associatedMap.map.latLngToLayerPoint(associatedMap.mapInitialCenter);
+		mapTitleImage.style("width", "460px").style("height", "430px")
+			.transition()
+			.attr("transform", "translate(" + (mapCenter.x - 450) + "," + (mapCenter.y - 350) + ")rotate(-12,100,100)")
+			.duration(300);
+		mapTitleText.transition()
+			.attr("transform", "translate(" + (mapCenter.x - 50) + "," + (mapCenter.y + 300) + ")")
+			.style("font-size", "220px")
+			duration(300);
+		
 	} else {
 		/* not back to original states */
 		associatedMap.map.setMaxBounds(associatedMap.mapMaxBoundsZoom);
