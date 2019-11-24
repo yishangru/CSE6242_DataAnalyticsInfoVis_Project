@@ -106,6 +106,6 @@ function hostProcess(d) {
 		type: d["property_type"],
 		minimunNights: +d["minimun_nights"],
 		reviewCount: +d["number_of_reviews"],
-		amenities: d["amenities"].replace("{", "").replace("}", "")
+		amenities: d["amenities"].replace(/{/g, "").replace(/}/g, "").replace(/"/g, '')
 	}
 }

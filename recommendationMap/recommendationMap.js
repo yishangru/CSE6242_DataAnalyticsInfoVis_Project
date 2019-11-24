@@ -543,9 +543,9 @@ recommendationMap.prototype.updateRestaurantMarkerShow = function(restaurantId) 
 		restaurantMarkerGroup[0].setIcon(iconRestaurant);
 		/* bind tooltip to the marker */
 		let tooltipContent = '<h4>' + restaurantInfo["name"] + '</h4>\
-			Star:&nbsp;' + restaurantInfo["star"] + '/5<br/>\
-			Address:&nbsp;' + restaurantInfo["address"] + '<br/>\
-			Popularity (Review Count):&nbsp;' + restaurantInfo["reviewCount"] + '<br/>\
+			Star:&nbsp;' + restaurantInfo["star"] + '/5<br>\
+			Address:&nbsp;' + restaurantInfo["address"] + '<br>\
+			Popularity (Review Count):&nbsp;' + restaurantInfo["reviewCount"] + '<br>\
 			Categories:&nbsp;<p>' + restaurantInfo["categories"] + '</p>';
 		restaurantMarkerGroup[0].bindTooltip(tooltipContent, {
 			className: "restaurantToolTip",
@@ -700,12 +700,13 @@ recommendationMap.prototype.updateHostMarkerShow = function(hostId) {
 		hostMarkerGroup[0].setIcon(iconhost);
 		/* bind tooltip to the marker */
 		let tooltipContent = '<h4>' + hostInfo["name"] + '</h4>\
-			Rating:&nbsp;' + hostInfo["rating"] + '/100<br/>\
-			Price:&nbsp;' + hostInfo["price"] + '<br/>\
-			Type:&nbsp;' + hostInfo["type"] + '<br/>\
-			Popularity (Review Count):&nbsp;' + hostInfo["reviewCount"] + '<br/>\
-			Description:&nbsp;<br/><p>They say the fishing is excellent at Lake Chargoggagoggmanchauggagoggchaubunagungamaugg, though I ve never been there myself.</p><br/>\
-			Amenities:&nbsp;<br/><p>They say the fishing is excellent at Lake Chargoggagoggmanchauggagoggchaubunagungamaugg, though I ve never been there myself.</p>';
+			Rating:&nbsp;&nbsp;' + hostInfo["rating"] + '/100<br>\
+			Price:&nbsp;&nbsp;' + hostInfo["price"] + '<br>\
+			Type:&nbsp;&nbsp;' + hostInfo["type"] + '<br>\
+			Popularity (Review Count):&nbsp;&nbsp;' + hostInfo["reviewCount"] + '<br>\
+			Amenities:<br><p>' + hostInfo["amenities"] + '</p><br>\
+			Neightbor Overview:<br><p>' + hostInfo["neightborOverview"];
+			//Description:<br><p>' + hostInfo["description"] + '</p><br>\
 		
 		hostMarkerGroup[0].bindTooltip(tooltipContent, {
 			className: "hostToolTip",
