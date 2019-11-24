@@ -13,20 +13,27 @@ html, body {
   padding: 0;
 }
 
-label.btn.btn-secondary,
-label.btn.btn-secondary:focus,
-label.btn.btn-secondary:active,
-label.btn.btn-secondary.active,
-label.btn.btn-secondary.active:focus,
-label.btn.btn-secondary.active:active {
-    color: rgb(251,128,114);
+.preferenceInfo div button.btn.btn-primary {
     border-radius: 10px;
-    font-size: 19px;
+    font-size: 20px !important;
     font-weight: bold;
-    padding: 0px 10px 0px 10px;
-    margin: 5px 5px 2px 5px;
+    padding: 0px 2px 0px 2px !important;
+    margin: 5px 3px 2px 2px;
     border-color: rgb(251,128,114) !important;
     box-shadow: none !important;
+    background: rgba(251,180,174,0) !important;
+}
+
+.preferenceInfo div button.btn.btn-primary:active,
+.preferenceInfo div button.btn.btn-primary.active,
+.preferenceInfo div button.btn.btn-primary.active:focus,
+.preferenceInfo div button.btn.btn-primary.active:active {
+    color: rgb(251,128,114) !important;
+    background: rgba(251,180,174,0.8) !important;
+}
+
+.preferenceInfo div button.btn.btn-primary:hover{
+    background: rgba(127,201,127,0.8) !important;
 }
 
 #recommendationMap svg #recommendationMapmapTitleText {
@@ -69,22 +76,6 @@ label.btn.btn-secondary.active:active {
   background: rgba(255,217,47,0.8);
   box-shadow: 0 0 15px rgba(0,0,0,0.2);
   border-radius: 5px;
-}
-
-.preferenceInfo div label {
-  margin: 2px;
-  border-radius: 10px;
-  background: rgba(0,0,0,0);
-}
-
-.preferenceInfo div label:hover{
-  background: rgba(127,201,127,0.8);
-}
-
-.preferenceInfo div label:active,
-.preferenceInfo div label:focus,
-.preferenceInfo div .active {
-  background: rgba(251,180,174,0.8) !important;
 }
 
 .preferenceInfo .preferenceButton {

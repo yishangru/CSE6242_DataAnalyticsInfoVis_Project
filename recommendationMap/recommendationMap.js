@@ -68,30 +68,26 @@ function recommendationMap(divId, maxZoom) {
 		}
 		this.preferenceInfo.addTo(this.map);
 		let preferencediv = d3.select("#" + this.divId).select(".preferenceInfo")
-			.style("width", "360px")
+			.style("width", "370px")
 			.style("height", "42px");
 
-		let preferenceForm = preferencediv.append("div")
-			.attr("class", "btn-group btn-group-sm")
-			.attr("data-toggle", "buttons");
-		preferenceForm.append("label")
-			.attr("class", "btn btn-secondary active")
+		let preferenceForm = preferencediv.append("div");
+		preferenceForm.append("button")
+			.attr("class", "btn btn-primary active")
+			.attr("id", "preferenceSearch")
 			.attr("data-type", "Preference Search")
+			.datum("Preference Search")
 			.text("Preference Search \u2713")
-			.style("width", "165px")
-			.append("input")
-			.attr("type", "checkbox")
-			.attr("name", "options")
-			.attr("autocomplete", "off");
-		preferenceForm.append("label")
-			.attr("class", "btn btn-secondary")
+			.style("width", "170px")
+			.on("click", toggelSelection);
+		preferenceForm.append("button")
+			.attr("class", "btn btn-primary")
+			.attr("id", "preferenceList")
 			.attr("data-type", "Preference List")
+			.datum("Preference List")
 			.text("Preference List")
-			.style("width", "150px")
-			.append("input")
-			.attr("type", "checkbox")
-			.attr("name", "options")
-			.attr("autocomplete", "off");
+			.style("width", "155px")
+			.on("click", toggelSelection);
 		preferencediv.append("button")
 			.attr("type", "button")
 			.attr("class", "preferenceButton")
@@ -453,7 +449,7 @@ recommendationMap.prototype.showSelectedAttractionRange = function() {
 	}
 }
 
-
+/* batch update restaurant marker */
 recommendationMap.prototype.updateRestaurantMarker = function(whetherUpdate) {
 	/* 
 	When new attraction is selected, read selection;
@@ -481,6 +477,7 @@ recommendationMap.prototype.updateRestaurantMarker = function(whetherUpdate) {
 	});
 }
 
+/* update single restaurant marker */
 recommendationMap.prototype.updateRestaurantMarkerShow = function(restaurantId) {
 	let associatedMap = this;
 	let restaurantInfo = restaurantInfoMap.get(restaurantId);
@@ -610,7 +607,7 @@ recommendationMap.prototype.showSelectedRestaurantRange = function() {
 	}
 }
 
-
+/* batch update host marker */
 recommendationMap.prototype.updateHostMarker = function(whetherUpdate) {
 	/* 
 	When new attraction is selected, read selection;
@@ -637,6 +634,7 @@ recommendationMap.prototype.updateHostMarker = function(whetherUpdate) {
 	});
 }
 
+/* update single restaurant marker */
 recommendationMap.prototype.updateHostMarkerShow = function(hostId) {
 	let associatedMap = this;
 	let hostInfo = hostInfoMap.get(hostId);
@@ -858,8 +856,9 @@ function expandInfoSection(e){
 		d3.select(this.parentNode).style("height", "42px");
 		if (buttonClass === "preferenceButton") {
 			d3.select(this).text("▲");
-			d3.select(this.parentNode).select(".showPreference").remove();
+			d3.select(this.parentNode).select("#showPreference").remove();
 		} else {
+			/* for dash board top right */
 			d3.select(this).text("▼");
 			d3.select(this.parentNode).select(".infoTable").remove();
 		}
@@ -968,8 +967,34 @@ function expandInfoSection(e){
 	} else if (buttonClass === "preferenceButton") {
 		d3.select(this.parentNode).style("height", "400px");
 		d3.select(this).text("▼");
-		let appenddiv = d3.select(this.parentNode).append("div").attr("class", "showPreference");
-		appenddiv.html("<p>This is for preference search<br/>Not Implement Yet</p>");
+		updatePreferencePanel(this.parentNode);
+	}
+}
+
+function toggelSelection(e){
+	if (!d3.select(this).classed('active')) {
+		presentActive = d3.select(this.parentNode).select(".btn.btn-primary.active")
+			.text(d=>d)
+			.classed('active', false);
+		d3.select(this)
+			.text(function(d) {
+				return d + " \u2713";
+			})
+			.classed('active', true);
+		updatePreferencePanel(this.parentNode.parentNode);
+	}
+}
+
+function updatePreferencePanel(preferenceDiv) {
+	if (d3.select(preferenceDiv).style("height") === "400px") {
+		let appenddiv = d3.select(preferenceDiv).select("#showPreference");
+		let presentSelectionId = d3.select(preferenceDiv).select(".btn.btn-primary.active").attr("id"); 
+		if (appenddiv.empty() || appenddiv.datum() !== presentSelectionId){
+			appenddiv = d3.select(preferenceDiv).append("div").attr("id", "showPreference").datum(presentSelectionId);
+			/* update content for preference board */
+			appenddiv.html("<p>This is for preference search<br/>Not Implement Yet</p>");
+			console.log("update " + appenddiv.datum() + "...");
+		}
 	}
 }
 /* end map interaction */
