@@ -281,6 +281,8 @@ recommendationMap.prototype.updateAttractionMarkerShow = function(attractionId) 
 
 		attractionMarkerGroup[2].associatedMap = associatedMap;
 		attractionMarkerGroup[2].attractionId = attractionId;
+
+		/* wait to add : final verison */
 		attractionMarkerGroup[2].on("click", function(e){
 			/* add to preference list, not implement yet*/
 		})
@@ -518,6 +520,8 @@ recommendationMap.prototype.updateRestaurantMarkerShow = function(restaurantId) 
 
 		restaurantMarkerGroup[1].associatedMap = associatedMap;
 		restaurantMarkerGroup[1].restaurantId = restaurantId;
+		
+		/* wait to add : final verison */
 		restaurantMarkerGroup[1].on("click", function(e){
 			/* add to preference list, not implement yet*/
 		})
@@ -675,6 +679,8 @@ recommendationMap.prototype.updateHostMarkerShow = function(hostId) {
 
 		hostMarkerGroup[1].associatedMap = associatedMap;
 		hostMarkerGroup[1].hostId = hostId;
+
+		/* wait to add : final verison */
 		hostMarkerGroup[1].on("click", function(e){
 			/* add to preference list, not implement yet*/
 		})
@@ -986,6 +992,7 @@ function toggelSelection(e){
 	}
 }
 
+/* wait to add : final verison */
 function updatePreferencePanel(preferenceDiv) {
 	if (d3.select(preferenceDiv).style("height") === "400px") {
 		let appenddiv = d3.select(preferenceDiv).select("#showPreference");
