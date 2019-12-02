@@ -330,7 +330,6 @@ recommendationMap.prototype.clearAllVis = function() {
 				let associatedMap = this.associatedMap
 				// let checkedMarker = associatedMap.attractionMarkerMap.get(this.attractionId)[3];
 				associatedMap.attractionPreferenceList.add(this.attractionId);
-				console.log(d3.select("#" + associatedMap.divId).select(".preferenceInfo"));
 				updatePreferencePanel(d3.select("#" + associatedMap.divId).select(".preferenceInfo"));
 			})
 		}
@@ -354,8 +353,8 @@ recommendationMap.prototype.clearAllVis = function() {
 			}));
 			/* bind tooltip to the marker */
 			let tooltipContent = '<h4>' + attractionInfo["name"] + '</h4>\
-				Introduction:<br/>' + attractionInfo["introduction"] + '<br/>\
-				Website:&nbsp;<p>' + attractionInfo["website"] + '</p>';
+				Introduction:<p>' + attractionInfo["introduction"] + '</p>\
+				Website:&nbsp;<br>' + attractionInfo["website"];
 			attractionMarkerGroup[0].bindTooltip(tooltipContent, {
 				className: "attractionToolTip",
 				offset: [0, -1 * Math.round((heightIcon/2 + 4) * scaleFactor)],

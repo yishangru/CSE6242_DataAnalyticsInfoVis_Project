@@ -266,7 +266,7 @@ html, body {
     font-weight: 200;
     min-width: 135px;
     font-family: pirates;
-    font-size: 15px;
+    font-size: 12px;
 }
 
 .attractionToolTip h4{
@@ -275,7 +275,9 @@ html, body {
 }
 
 .attractionToolTip p{
-  font-size: 12px;
+  font-size: 15px;
+  word-break: break-word;
+  white-space: normal;
   color: rgb(255,127,0);
 }
 
@@ -301,7 +303,7 @@ html, body {
 }
 
 .restaurantToolTip p{
-  word-break: break-all;
+  word-break: break-word;
   white-space: normal;
   font-size: 15px;
   font-weight: bold;
@@ -332,7 +334,7 @@ html, body {
 
 .hostToolTip p{
   display: inline;
-  word-break: break-all;
+  word-break: break-word;
   white-space: normal;
   overflow-wrap: break-word;
   font-size: 15px;
