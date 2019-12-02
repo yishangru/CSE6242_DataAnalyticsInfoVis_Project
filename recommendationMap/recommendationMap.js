@@ -1049,9 +1049,9 @@ function updatePreferencePanel(preferenceDiv) {
 		let appenddiv = preferenceDiv.select("#showPreference");
 		let presentSelectionId = preferenceDiv.select(".btn.btn-primary.active").attr("id");
 
-		preferenceDiv.select("#showPreference").remove();
-		appenddiv = preferenceDiv.append("div").attr("id", "showPreference").datum(presentSelectionId);
-		if (appenddiv.datum() === "preferenceList"){
+		if (presentSelectionId === "preferenceList"){
+			preferenceDiv.select("#showPreference").remove();
+			appenddiv = preferenceDiv.append("div").attr("id", "showPreference").datum(presentSelectionId);
 			/* get attraction, restaurant, host data from associated map*/
 			let associatedMap = preferenceDiv.select(".associatedMap").datum();
 			let attractionPreferenceList = [];
@@ -1118,11 +1118,13 @@ function updatePreferencePanel(preferenceDiv) {
 					associatedMap.hostPreferenceList.remove(d);
 					d3.select(this).remove();
 				});	
-		} else if (appenddiv.datum() === "preferenceSearch") {
-			appenddiv.append("h2").text("Restaurant OR Airbnb");
-			appenddiv.append("h2").text("keyword Search");
+		} else if (presentSelectionId === "preferenceSearch") {
+			if (appenddiv.empty()) {
+				appenddiv = preferenceDiv.append("div").attr("id", "showPreference").datum(presentSelectionId);
+				appenddiv.append("h2").text("Restaurant OR Airbnb");
+				appenddiv.append("h2").text("keyword Search");
+			}
 		}
-
 		/*
 		 else {
 			d3.select(preferenceDiv).select("#showPreference").remove();
