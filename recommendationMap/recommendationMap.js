@@ -1063,7 +1063,7 @@ function updatePreferencePanel(preferenceDiv) {
 
 				/* attraction button set */
 				let attractionappendbuttonset = appenddiv.append("g").attr("class", "attractionButtonSet");
-				attractionappendbuttonset.append("div").text("Attraction");
+				attractionappendbuttonset.append("div").text("Attractions Preference").style("font-size", "20px");
 				let attractionappendbutton = attractionappendbuttonset
 					.selectAll("button").attr("class", "attractionButton").data(attractionPreferenceList);
 				attractionappendbutton.exit().remove();
@@ -1082,7 +1082,7 @@ function updatePreferencePanel(preferenceDiv) {
 					});
 				/* restaurant button set */
 				let restaurantappendbuttonset = appenddiv.append("g").attr("class", "restaurantButtonSet");
-				restaurantappendbuttonset.append("div").text("Restaurant");
+				restaurantappendbuttonset.append("div").text("Restaurants Preference").style("font-size", "20px");
 				let restaurantappendbutton = restaurantappendbuttonset
 					.selectAll("button").attr("class", "restaurantButton").data(restaurantPreferenceList);
 				restaurantappendbutton.exit().remove();
@@ -1101,7 +1101,7 @@ function updatePreferencePanel(preferenceDiv) {
 					});				
 				/* host button set*/
 				let hostappendbuttonset = appenddiv.append("g").attr("class", "hostButtonSet");
-				hostappendbuttonset.append("div").text("host");
+				hostappendbuttonset.append("div").text("Hosts Preference").style("font-size", "20px");
 				let hostappendbutton = hostappendbuttonset
 					.selectAll("button").attr("class", "hostButton").data(hostPreferenceList);
 				hostappendbutton.exit().remove();
