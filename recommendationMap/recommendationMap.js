@@ -1203,8 +1203,16 @@ function updatePreferencePanel(preferenceDiv) {
 }
 
 function keyWordSearch() {
+	jQuery.support.cors = true;
 	let searchKey = d3.select(this.parentNode).select("input").property("value");
-	
+	$.ajax({
+	  url: "http://localhost:5000/keywordSearch.py",
+	  type: "POST",
+	  data: { param: ["restaurant", "mexican"]},
+	  success: function(data) {
+	  	console.log(data);
+	  } 
+	});
 }
 
 function findPreference(d) {
