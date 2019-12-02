@@ -78,14 +78,12 @@ function recommendationMap(divId, maxZoom) {
 		let preferencediv = d3.select("#" + this.divId).select(".preferenceInfo")
 			.style("width", "370px")
 			.style("height", "42px");
-		
 		/* add preference button */
 		let preferenceForm = preferencediv.append("div");
 		preferenceForm.append("g").attr("class", "associatedMap").datum(this);
 		preferenceForm.append("button")
 			.attr("class", "btn btn-primary active")
 			.attr("id", "preferenceSearch")
-			.attr("data-type", "Preference Search")
 			.datum("Preference Search")
 			.text("Preference Search \u2713")
 			.style("width", "170px")
@@ -93,7 +91,6 @@ function recommendationMap(divId, maxZoom) {
 		preferenceForm.append("button")
 			.attr("class", "btn btn-primary")
 			.attr("id", "preferenceList")
-			.attr("data-type", "Preference List")
 			.datum("Preference List")
 			.text("Preference List")
 			.style("width", "155px")
@@ -331,16 +328,8 @@ recommendationMap.prototype.clearAllVis = function() {
 			attractionMarkerGroup[2].on("click", function(e){
 				/* add to preference list, not implement yet*/
 				let associatedMap = this.associatedMap
-				let checkedMarker = associatedMap.attractionMarkerMap.get(this.attractionId)[3];
-
-				if (associatedMap.attractionPreferenceList.has(this.attractionId)){
-					associatedMap.attractionPreferenceList.remove(this.attractionId);
-				} else {
-					associatedMap.attractionPreferenceList.add(this.attractionId);
-				}
-
-				//console.log(associatedMap.attractionPreferenceList);
-				
+				// let checkedMarker = associatedMap.attractionMarkerMap.get(this.attractionId)[3];
+				associatedMap.attractionPreferenceList.add(this.attractionId);
 			})
 		}
 		/* remove already added marker for enlarge zoom event */
@@ -582,15 +571,8 @@ recommendationMap.prototype.clearAllVis = function() {
 			restaurantMarkerGroup[1].on("click", function(e){
 				/* add to preference list, not implement yet*/
 				let associatedMap = this.associatedMap
-				let checkedMarker = associatedMap.restaurantMarkerMap.get(this.restaurantId)[3];
-
-				if (associatedMap.restaurantPreferenceList.has(this.restaurantId)){
-					associatedMap.restaurantPreferenceList.remove(this.restaurantId);
-				} else {
-					associatedMap.restaurantPreferenceList.add(this.restaurantId);
-				}
-
-				//console.log(associatedMap.restaurantPreferenceList);
+				//let checkedMarker = associatedMap.restaurantMarkerMap.get(this.restaurantId)[3];
+				associatedMap.restaurantPreferenceList.add(this.restaurantId);
 			})
 		}
 		/* remove already added marker for enlarge zoom event */
@@ -754,14 +736,8 @@ recommendationMap.prototype.clearAllVis = function() {
 			hostMarkerGroup[1].on("click", function(e){
 				/* add to preference list, not implement yet*/
 				let associatedMap = this.associatedMap
-				let checkedMarker = associatedMap.hostMarkerMap.get(this.hostId)[3];
-
-				if (associatedMap.hostPreferenceList.has(this.hostId)){
-					associatedMap.hostPreferenceList.remove(this.hostId);
-				} else {
-					associatedMap.hostPreferenceList.add(this.hostId);
-				}
-
+				// let checkedMarker = associatedMap.hostMarkerMap.get(this.hostId)[3];
+				associatedMap.hostPreferenceList.add(this.hostId);
 				//console.log(associatedMap.hostPreferenceList);
 			})
 		}
@@ -1052,7 +1028,7 @@ function expandInfoSection(e){
 
 function toggelSelection(e){
 	if (!d3.select(this).classed('active')) {
-		presentActive = d3.select(this.parentNode).select(".btn.btn-primary.active")
+		let presentActive = d3.select(this.parentNode).select(".btn.btn-primary.active")
 			.text(d=>d)
 			.classed('active', false);
 		d3.select(this)
@@ -1072,22 +1048,18 @@ function updatePreferencePanel(preferenceDiv) {
 		let appenddiv = d3.select(preferenceDiv).select("#showPreference");
 		let presentSelectionId = d3.select(preferenceDiv).select(".btn.btn-primary.active").attr("id");
 
-		/* get attraction, restaurant, host data from associated map*/
-		let associatedMap = d3.select(preferenceDiv).select(".associatedMap").datum()
-		let attractionPreferenceList = [];
-		associatedMap.attractionPreferenceList.each(function(v){attractionPreferenceList.push(v);});
-		let restaurantPreferenceList = [];
-		associatedMap.restaurantPreferenceList.each(function(v){restaurantPreferenceList.push(v);});
-		let hostPreferenceList = [];
-		associatedMap.hostPreferenceList.each(function(v){hostPreferenceList.push(v);});
-
 		if (appenddiv.empty() || appenddiv.datum() !== presentSelectionId){
 			d3.select(preferenceDiv).select("#showPreference").remove();
-			let appenddiv = d3.select(preferenceDiv).append("div").attr("id", "showPreference").datum(presentSelectionId);
+			appenddiv = d3.select(preferenceDiv).append("div").attr("id", "showPreference").datum(presentSelectionId);
 			if (appenddiv.datum() === "preferenceList"){
-				console.log(attractionPreferenceList);
-				console.log(restaurantPreferenceList);
-				console.log(hostPreferenceList); 
+				/* get attraction, restaurant, host data from associated map*/
+				let associatedMap = d3.select(preferenceDiv).select(".associatedMap").datum();
+				let attractionPreferenceList = [];
+				associatedMap.attractionPreferenceList.each(function(v){attractionPreferenceList.push(v);});
+				let restaurantPreferenceList = [];
+				associatedMap.restaurantPreferenceList.each(function(v){restaurantPreferenceList.push(v);});
+				let hostPreferenceList = [];
+				associatedMap.hostPreferenceList.each(function(v){hostPreferenceList.push(v);});
 
 				/* attraction button set */
 				let attractionappendbuttonset = appenddiv.append("g").attr("class", "attractionButtonSet");
@@ -1097,11 +1069,17 @@ function updatePreferencePanel(preferenceDiv) {
 				attractionappendbutton.exit().remove();
 				attractionappendbutton.enter().append("button")
 					.text(function(d){
+						this.associatedMap = associatedMap;
 						let attractionInfo = attractionInfoMap.get(d)
 						return attractionInfo.name;
 					})
 					.style("background-color", "orange")
-					.style("width", "155px");
+					.style("width", "155px")
+					.on("click", function(d) {
+						let associatedMap = this.associatedMap;
+						associatedMap.attractionPreferenceList.remove(d);
+						d3.select(this).remove();
+					});
 				/* restaurant button set */
 				let restaurantappendbuttonset = appenddiv.append("g").attr("class", "restaurantButtonSet");
 				restaurantappendbuttonset.append("div").text("Restaurant");
@@ -1110,11 +1088,17 @@ function updatePreferencePanel(preferenceDiv) {
 				restaurantappendbutton.exit().remove();
 				restaurantappendbutton.enter().append("button")
 					.text(function(d){
+						this.associatedMap = associatedMap;
 						let restaurantInfo = restaurantInfoMap.get(d)
 						return restaurantInfo.name;
 					})
 					.style("background-color", "orange")
-					.style("width", "155px");				
+					.style("width", "155px")
+					.on("click", function(d) {
+						let associatedMap = this.associatedMap;
+						associatedMap.restaurantPreferenceList.remove(d);
+						d3.select(this).remove();
+					});				
 				/* host button set*/
 				let hostappendbuttonset = appenddiv.append("g").attr("class", "hostButtonSet");
 				hostappendbuttonset.append("div").text("host");
@@ -1123,18 +1107,29 @@ function updatePreferencePanel(preferenceDiv) {
 				hostappendbutton.exit().remove();
 				hostappendbutton.enter().append("button")
 					.text(function(d){
+						this.associatedMap = associatedMap;
 						let hostInfo = hostInfoMap.get(d)
 						return hostInfo.name;
 					})
 					.style("background-color", "orange")
-					.style("width", "155px");	
+					.style("width", "155px")
+					.on("click", function(d) {
+						let associatedMap = this.associatedMap;
+						associatedMap.hostPreferenceList.remove(d);
+						d3.select(this).remove();
+					});	
+			} else if (appenddiv.datum() === "preferenceSearch") {
+				appenddiv.append("h2").text("Restaurant OR Airbnb");
+				appenddiv.append("h2").text("keyword Search");
 			}
 
 			/* update content for preference board */
 			// appenddiv.html("<p>This is for preference search<br/>Not Implement Yet</p>");
 			console.log("update " + appenddiv.datum() + "...");
+		}
 
-		} else {
+		/*
+		 else {
 			d3.select(preferenceDiv).select("#showPreference").remove();
 			let appenddiv = d3.select(preferenceDiv).append("div").attr("id", "showPreference").datum(presentSelectionId);
 			if (appenddiv.datum() === "preferenceList"){
@@ -1142,7 +1137,6 @@ function updatePreferencePanel(preferenceDiv) {
 				console.log(restaurantPreferenceList);
 				console.log(hostPreferenceList); 
 
-				/* attraction button set */
 				let appendbuttonset = appenddiv.append("g").attr("class", "attractionButtonSet");
 				appendbuttonset.append("div").text("Attraction");
 				let appendbutton = appendbuttonset
@@ -1155,7 +1149,7 @@ function updatePreferencePanel(preferenceDiv) {
 					})
 					.style("background-color", "orange")
 					.style("width", "155px");
-				/* restaurant button set */
+
 				let restaurantappendbuttonset = appenddiv.append("g").attr("class", "restaurantButtonSet");
 				restaurantappendbuttonset.append("div").text("Restaurant");
 				let restaurantappendbutton = restaurantappendbuttonset
@@ -1168,7 +1162,7 @@ function updatePreferencePanel(preferenceDiv) {
 					})
 					.style("background-color", "orange")
 					.style("width", "155px");				
-				/* host button set */
+
 				let hostappendbuttonset = appenddiv.append("g").attr("class", "hostButtonSet");
 				hostappendbuttonset.append("div").text("host");
 				let hostappendbutton = hostappendbuttonset
@@ -1184,8 +1178,7 @@ function updatePreferencePanel(preferenceDiv) {
 			}
 			console.log("update " + appenddiv.datum() + "...");
 		}
-
-
+		*/
 	}
 }
 /* end map interaction */
