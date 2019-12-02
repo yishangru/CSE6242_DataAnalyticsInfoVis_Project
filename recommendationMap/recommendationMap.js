@@ -1203,7 +1203,8 @@ function updatePreferencePanel(preferenceDiv) {
 }
 
 function keyWordSearch() {
-	console.log(d3.select(this.parentNode).select("input").property("value"));
+	let searchKey = d3.select(this.parentNode).select("input").property("value");
+	
 }
 
 function findPreference(d) {
