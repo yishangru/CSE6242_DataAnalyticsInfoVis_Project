@@ -75,12 +75,15 @@ function recommendationMap(divId, maxZoom) {
 		}
 		this.preferenceInfo.addTo(this.map);
 
+		let associatedMap = this;
 		let preferencediv = d3.select("#" + this.divId).select(".preferenceInfo")
 			.style("width", "370px")
-			.style("height", "42px");
+			.style("height", "42px")
+			.each(function(d) {
+				this.associatedMap = associatedMap;
+			});
 		/* add preference button */
 		let preferenceForm = preferencediv.append("div");
-		preferenceForm.append("g").attr("class", "associatedMap").datum(this);
 		preferenceForm.append("button")
 			.attr("class", "btn btn-primary active")
 			.attr("id", "preferenceSearch")
@@ -1044,6 +1047,10 @@ function toggelSelection(e){
 
 /* wait to add : final verison */
 function updatePreferencePanel(preferenceDiv) {
+	let associatedMap;
+	preferenceDiv.each(function(d) {
+		associatedMap = this.associatedMap;
+	})
 	if (preferenceDiv.style("height") === "400px") {
 		let appenddiv = preferenceDiv.select("#showPreference");
 		let presentSelectionId = preferenceDiv.select(".btn.btn-primary.active").attr("id");
@@ -1052,7 +1059,6 @@ function updatePreferencePanel(preferenceDiv) {
 			preferenceDiv.select("#showPreference").remove();
 			appenddiv = preferenceDiv.append("div").attr("id", "showPreference").datum(presentSelectionId);
 			/* get attraction, restaurant, host data from associated map*/
-			let associatedMap = preferenceDiv.select(".associatedMap").datum();
 			let attractionPreferenceList = [];
 			associatedMap.attractionPreferenceList.each(function(v){attractionPreferenceList.push(v);});
 			let restaurantPreferenceList = [];
@@ -1116,67 +1122,94 @@ function updatePreferencePanel(preferenceDiv) {
 					let associatedMap = this.associatedMap;
 					associatedMap.hostPreferenceList.remove(d);
 					d3.select(this).remove();
-				});	
+				});
+			appenddiv.selectAll(".goPreferenceButton").data(["Find Hosts", "Find Rest"])
+				.enter().append("button").attr("class", "goPreferenceButton").attr("type", "button")
+				.text(d=>d).on("click", findPreference);
+
 		} else if (presentSelectionId === "preferenceSearch") {
-			if (appenddiv.empty()) {
+			if (appenddiv.empty() || appenddiv.datum() !== presentSelectionId) {
+				appenddiv.remove();
 				appenddiv = preferenceDiv.append("div").attr("id", "showPreference").datum(presentSelectionId);
-				appenddiv.append("h2").text("Restaurant OR Airbnb");
-				appenddiv.append("h2").text("keyword Search");
+				let appendForm = appenddiv.append("form").attr("id", "searchForm");
+				let yelpRadio = appendForm.append("input").attr("id", "yelpKeySearch")
+					.attr("type", "radio").attr("name", "yelpKeySearch").attr("class", "radioKeyButton").style("margin", "10px 0px 0px 10px");
+				appendForm.append("label").attr("for","yelpKeySearch").text("Local Restaurants").style("font-size", "18px").style("margin", "0px 20px 5px 10px");
+				let airbnbRadio = appendForm.append("input").attr("id", "airbnbKeySearch")
+					.attr("type", "radio").attr("name", "airbnbKeySearch").attr("class", "radioKeyButton").style("margin", "10px 0px 0px 10px");
+				appendForm.append("label").attr("for","yelpKeySearch").text("Local Hosts").style("font-size", "18px").style("margin", "0px 20px 3px 10px");
+
+				d3.select("#" + associatedMap.divId).selectAll(".radioKeyButton").on("click", function(){
+					d3.select(this.parentNode).selectAll(".radioKeyButton").each(function(d){
+						d3.select(this).property('checked', false);
+					})
+					d3.select(this).property('checked', true);
+					let searchPanel = d3.select(this.parentNode).select("#searchPanel");
+					searchPanel.remove();
+					searchPanel = d3.select(this.parentNode).append("div").attr("id", "searchPanel").style("margin", "20px 0px 20px 30px");
+					searchPanel.html("Enter Key-word:<br><input type='text' name='keywordEnter'>")
+						.style("font-size", "20px")
+						.append("button").attr("type", "button").attr("id", "submitKeySearch").text("Go!")
+						.style("margin-left", "10px")
+						.style("font-size", "18px")
+						.on("click", keyWordSearch);
+
+    				let svgDrawKey = searchPanel.append("svg").attr("width", "300px").attr("height", "240px").attr("id", "keyWordDraw");
+    				svgDrawKey.append("text").attr("id", "searchTitle").text("Candidate Keys:").attr("transform", "translate(5, 35)").style("font-size", "25px");
+    				let keyWordGroup = svgDrawKey.selectAll(".keyWordGroup")
+    					.data([
+    						{key: "service", freq: 3294},
+    						{key: "delicious", freq: 1328},
+    						{key: "chicken", freq: 945},
+    						{key: "pizza", freq: 696},
+    						{key: "fast", freq: 539},
+    						{key: "drinks", freq: 394},
+    						{key: "mexican", freq: 482},
+    						{key: "breakfast", freq: 376},
+    						{key: "bar", freq: 822},
+    						{key: "fresh", freq: 1367},
+    					]).enter().append("g").attr("class", "keyWordGroup")
+    					.attr("transform", function(d, i) {
+    						let line = Math.floor(i/5);
+    						return "translate(" + 60 * (i%5) + "," + (line * 80 + 50) + ")";
+    					});
+    				keyWordGroup.selectAll("circle").data(function(d) {
+    					return [d];
+    				}).enter().append("circle").attr("fill", "#31a354").attr("r", "25px").attr("cx", "25px").attr("cy", "25px");
+    				keyWordGroup.selectAll(".textKeys").data(function(d) {
+    					return [d];
+    				}).enter().append("text").attr("class", "textKeys")
+    					.text(d=>d.key).attr("transform", "translate(25,65)")
+    					.style("font-size", "16px").style("text-anchor", "middle");
+    				keyWordGroup.selectAll(".textFreqs").data(function(d) {
+    					return [d];
+    				}).enter().append("text").attr("class", "textFreqs")
+    					.text(d=>"" + d.freq).attr("transform", "translate(25,30)")
+    					.style("font-size", "20px").style("text-anchor", "middle")
+    					.style("cursor", "pointer")
+    					.on("click", function(d) {
+    						let presentKey = d3.select("#searchPanel").select("input").property("value");
+    						if (presentKey){
+    							presentKey = presentKey + " " + d.key;
+    						} else {
+    							presentKey = d.key;
+    						}
+    						d3.select("#searchPanel").select("input").property("value", presentKey);
+    					});
+				});
 			}
 		}
-		/*
-		 else {
-			d3.select(preferenceDiv).select("#showPreference").remove();
-			let appenddiv = d3.select(preferenceDiv).append("div").attr("id", "showPreference").datum(presentSelectionId);
-			if (appenddiv.datum() === "preferenceList"){
-				console.log(attractionPreferenceList);
-				console.log(restaurantPreferenceList);
-				console.log(hostPreferenceList); 
-
-				let appendbuttonset = appenddiv.append("g").attr("class", "attractionButtonSet");
-				appendbuttonset.append("div").text("Attraction");
-				let appendbutton = appendbuttonset
-					.selectAll("button").attr("class", "attractionButton").data(attractionPreferenceList);
-				appendbutton.exit().remove();
-				appendbutton.enter().append("button")
-					.text(function(d){
-						let attractionInfo = attractionInfoMap.get(d)
-						return attractionInfo.name;
-					})
-					.style("background-color", "orange")
-					.style("width", "155px");
-
-				let restaurantappendbuttonset = appenddiv.append("g").attr("class", "restaurantButtonSet");
-				restaurantappendbuttonset.append("div").text("Restaurant");
-				let restaurantappendbutton = restaurantappendbuttonset
-					.selectAll("button").attr("class", "restaurantButton").data(restaurantPreferenceList);
-				restaurantappendbutton.exit().remove();
-				restaurantappendbutton.enter().append("button")
-					.text(function(d){
-						let restaurantInfo = restaurantInfoMap.get(d)
-						return restaurantInfo.name;
-					})
-					.style("background-color", "orange")
-					.style("width", "155px");				
-
-				let hostappendbuttonset = appenddiv.append("g").attr("class", "hostButtonSet");
-				hostappendbuttonset.append("div").text("host");
-				let hostappendbutton = hostappendbuttonset
-					.selectAll("button").attr("class", "hostButton").data(hostPreferenceList);
-				hostappendbutton.exit().remove();
-				hostappendbutton.enter().append("button")
-					.text(function(d){
-						let hostInfo = hostInfoMap.get(d)
-						return hostInfo.name;
-					})
-					.style("background-color", "orange")
-					.style("width", "155px");
-			}
-			console.log("update " + appenddiv.datum() + "...");
-		}
-		*/
 	}
 }
+
+function keyWordSearch() {
+	console.log(d3.select(this.parentNode).select("input").property("value"));
+}
+
+function findPreference(d) {
+	console.log(d);
+}
+
 /* end map interaction */
 
 
