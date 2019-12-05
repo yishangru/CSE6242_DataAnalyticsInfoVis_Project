@@ -17,5 +17,7 @@
 ![Program Screenshot](./screenshots/screenshot7.PNG?raw=true)
 - Multiple selection, relation position visualized
 ![Program Screenshot](./screenshots/screenshot8.PNG?raw=true)
-- Preference search, not implement yet
+- Preference key word search
 ![Program Screenshot](./screenshots/screenshot9.PNG?raw=true)
+- Preference list search
+![Program Screenshot](./screenshots/screenshot10.PNG?raw=true)
