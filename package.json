@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/yishangru/CSE6242_DataAnalyticsInfoVis_Project#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.18.2"
   }
 }
